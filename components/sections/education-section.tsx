@@ -3,18 +3,18 @@ import { GraduationCap } from "lucide-react"
 
 const education = [
   {
-    school: "Your Current University",
+    school: "St. Paul University Philippines",
     degree: "Bachelor of Science in Information Technology",
     period: "2023 - Present",
-    location: "City, Country",
+    location: "Tuguegarao City, Philippines",
     description: "Currently pursuing degree in Information Technology"
   },
   {
     school: "St. Paul University Philippines",
     degree: "Basic Education",
-    period: "2016 - 2020",
+    period: "2016 - 2023",
     location: "Tuguegarao City, Philippines",
-    description: "Completed basic education with focus on robotics and computer programming"
+    description: "Completed Basic Education with competition experience on Robotics VEX IQ using Python programming"
   }
 ]
 

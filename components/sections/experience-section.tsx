@@ -5,9 +5,9 @@ const experiences = [
   {
     type: "education",
     title: "IT Student",
-    organization: "Current Institution",
+    organization: "School of Information Techonology and Engineering",
     period: "Present",
-    description: "Pursuing Bachelor of Science in Information Technology with focus on full-stack development",
+    description: "Pursuing Bachelor of Science in Information Technology with focus on Web Development",
     icon: Briefcase
   },
   {
@@ -16,7 +16,7 @@ const experiences = [
     organization: "STEAM International Challenge 2018 (Competition)",
     period: "November 2018",
     location: "Shenzhen, China",
-    description: "International robotics competition - Represented Team Philippines among 118 teams from 5 countries",
+    description: "International Robotics Competition - Represented Team Philippines among 118 teams from 5 countries",
     icon: Trophy
   },
   {
@@ -25,7 +25,7 @@ const experiences = [
     organization: "6th Robothon National Competition (Competition)",
     period: "October 2018",
     location: "Quezon City, Philippines",
-    description: "National robotics competition - Represented St. Paul University Philippines among 43 schools",
+    description: "National Robotics Competition - Represented St. Paul University Philippines among 43 schools",
     icon: Trophy
   }
 ]

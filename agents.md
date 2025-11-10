@@ -3,7 +3,7 @@ These are the setups, and specifications that I want you to make use of.
 use next js 15
 use set shadcn
 always use pnpm
-keep code clean, avoid duplicate components, look if there are components that can be reusable, if none, then make one. 
+keep code clean, avoid duplicate components, look if there are components that can be reusable, if none, then make one. (Refractors)
 always npm run build
 always npm run start
 

@@ -1,4 +1,4 @@
-COMPLETE REDESIGN OF PORTFOLIO!
+COMPLETE REDESIGN OF PORTFOLIO! A COMPLETE OVERHAUL AND CHANGE ON ALL. REMOVE THINGS THAT ARE NOT GOOD TO BE INCLUDED IN THE PORTFOLIO.
 
 I am not happy and satisfied it what it looks like. It does not look professional to me and its blown out. Make it more on the minimalist theme but at the same time interactive. Get rid of files that ARE NOT needed. check out the components for those.
 
@@ -19,4 +19,4 @@ tastes:
 - i like minimalist, clean design but not too plain.
 - implement dark mode and lightmode
 
-
+after done, commit all changes and push. there are current commits that are not done, so maybe that is a rebase.
