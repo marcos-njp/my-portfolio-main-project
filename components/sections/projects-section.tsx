@@ -43,7 +43,7 @@ export default function ProjectsSection() {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
         const scrollLeft = scrollContainerRef.current.scrollLeft
-        const cardWidth = 360
+        const cardWidth = 344 // 340px + 4px gap
         const newIndex = Math.round(scrollLeft / cardWidth)
         setActiveIndex(newIndex)
       }
