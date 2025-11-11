@@ -12,6 +12,8 @@ export default function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [visibleCount, setVisibleCount] = useState(1)
+  const cardWidth = 344 // 340px card + 4px gap
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project)
@@ -20,30 +22,27 @@ export default function ProjectsSection() {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 360
+      const scrollAmount = cardWidth * visibleCount
       const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount)
-      scrollContainerRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: 'smooth'
-      })
+      scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' })
+      // update active index immediately so dots respond right away
+      const newIndex = Math.round(newScrollLeft / cardWidth)
+      setActiveIndex(Math.max(0, Math.min(newIndex, projects.length - 1)))
     }
   }
 
   const scrollToIndex = (index: number) => {
     if (scrollContainerRef.current) {
-      const cardWidth = 360
-      scrollContainerRef.current.scrollTo({
-        left: index * cardWidth,
-        behavior: 'smooth'
-      })
+      const left = index * cardWidth
+      scrollContainerRef.current.scrollTo({ left, behavior: 'smooth' })
+      setActiveIndex(index)
     }
   }
-
+  // track scroll to update activeIndex
   useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
         const scrollLeft = scrollContainerRef.current.scrollLeft
-        const cardWidth = 344 // 340px + 4px gap
         const newIndex = Math.round(scrollLeft / cardWidth)
         setActiveIndex(newIndex)
       }
@@ -51,10 +50,28 @@ export default function ProjectsSection() {
 
     const container = scrollContainerRef.current
     if (container) {
-      container.addEventListener('scroll', handleScroll)
+      container.addEventListener('scroll', handleScroll, { passive: true })
       return () => container.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, [cardWidth])
+
+  // compute how many cards fit in the container (visible count)
+  useEffect(() => {
+    const updateVisible = () => {
+      const container = scrollContainerRef.current
+      if (container) {
+        const count = Math.max(1, Math.floor(container.clientWidth / cardWidth))
+        setVisibleCount(count)
+      } else {
+        // fallback for SSR or initial render
+        const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+        setVisibleCount(Math.max(1, Math.floor(width / cardWidth)))
+      }
+    }
+    updateVisible()
+    window.addEventListener('resize', updateVisible)
+    return () => window.removeEventListener('resize', updateVisible)
+  }, [cardWidth])
 
   return (
     <section 
