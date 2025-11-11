@@ -1,0 +1,213 @@
+{
+  "personal": {
+    "name": "Niño Marcos",
+    "title": "Full Stack Developer",
+    "location": "Tuguegarao City, Philippines",
+    "summary": "IT student passionate about building modern web applications with clean, elegant solutions. Experienced in full-stack development with Next.js, React, and TypeScript. Competition background in robotics programming using Python.",
+    "elevator_pitch": "Full-stack developer with a strong foundation in modern web technologies and a proven track record in international robotics competitions. I build scalable, user-friendly applications using Next.js, TypeScript, and cutting-edge tools like AI integration and RAG systems.",
+    "contact": {
+      "email": "justinpmarcos@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/niño-marcos/",
+      "github": "https://github.com/marcos-njp",
+      "portfolio": "https://my-portfolio-marcos-njp.vercel.app"
+    }
+  },
+  "salary_location": {
+    "current_status": "Student seeking internship or entry-level opportunities",
+    "salary_expectations": "Open to discussion based on role and responsibilities",
+    "location_preferences": ["Remote", "Tuguegarao City", "Manila", "Hybrid"],
+    "relocation_willing": true,
+    "remote_experience": "Experienced with remote collaboration and self-directed learning",
+    "travel_availability": "Available for travel as needed",
+    "work_authorization": "Filipino Citizen"
+  },
+  "experience": [
+    {
+      "company": "Personal Projects & Portfolio",
+      "title": "Full Stack Developer",
+      "duration": "2023 - Present",
+      "company_context": "Self-directed learning and project development",
+      "team_structure": "Independent developer with collaboration on open-source projects",
+      "achievements_star": [
+        {
+          "situation": "Need to demonstrate modern web development skills to potential employers and learn OAuth implementation",
+          "task": "Build a production-ready Next.js application with secure authentication and database integration",
+          "action": "Developed Person Search app using Next.js 15, implemented Google OAuth, integrated Prisma ORM with PostgreSQL, created protected routes, and deployed to Vercel with comprehensive documentation",
+          "result": "Successfully deployed secure application demonstrating full-stack capabilities. Gained practical experience with OAuth flows, database management, and modern deployment practices"
+        },
+        {
+          "situation": "Required a professional online presence to showcase skills and projects to recruiters",
+          "task": "Create a modern, responsive portfolio website that stands out from typical templates",
+          "action": "Built custom portfolio with Next.js 15, implemented dark/light mode theming using next-themes, added smooth animations with Framer Motion, optimized performance, and deployed to Vercel",
+          "result": "Created distinctive portfolio showcasing technical skills and design sensibility. Received positive feedback on clean, minimalist design approach"
+        },
+        {
+          "situation": "Growing interest in AI/ML technologies and need to demonstrate RAG system implementation",
+          "task": "Implement a production-ready RAG system for portfolio AI assistant",
+          "action": "Integrated Groq AI with llama-3.1-8b-instant model, set up Upstash Vector database for semantic search, structured professional profile using STAR methodology, implemented streaming responses with Vercel AI SDK",
+          "result": "Built functional AI assistant capable of answering recruiter queries about skills and experience in real-time, demonstrating modern AI integration capabilities"
+        }
+      ],
+      "technical_skills_used": ["Next.js 15", "TypeScript", "React", "Prisma", "PostgreSQL", "OAuth", "Tailwind CSS", "Groq AI", "Upstash Vector", "Vercel"],
+      "leadership_examples": ["Self-directed project planning and execution", "Documentation creation for knowledge sharing", "Code organization following best practices"],
+      "projects_managed": 3
+    },
+    {
+      "company": "STEAM International Challenge",
+      "title": "Team Philippines Representative",
+      "duration": "November 2018",
+      "company_context": "International robotics competition with 118 teams from 5 countries",
+      "team_structure": "Team member representing Philippines",
+      "achievements_star": [
+        {
+          "situation": "Selected to represent Team Philippines in international robotics competition in Shenzhen, China",
+          "task": "Compete in Programming Skills Excellence category against 118 international teams",
+          "action": "Developed and optimized Python programming solutions for VEX IQ robotics challenges, collaborated with team members, debugged code under time pressure",
+          "result": "Achieved 4th place finish in Programming Skills Excellence category, demonstrating strong problem-solving and coding skills on international stage"
+        }
+      ],
+      "technical_skills_used": ["Python", "VEX IQ Robotics", "Algorithm optimization", "Problem-solving under pressure"],
+      "leadership_examples": ["International competition representation", "Team collaboration"]
+    },
+    {
+      "company": "6th Robothon National Competition",
+      "title": "School Representative",
+      "duration": "October 2018",
+      "company_context": "National robotics competition with 43 participating schools",
+      "team_structure": "Team member representing St. Paul University Philippines",
+      "achievements_star": [
+        {
+          "situation": "Selected to represent school in prestigious national robotics competition",
+          "task": "Compete in robotics programming challenges against 43 schools nationwide",
+          "action": "Applied Python programming skills to robotics challenges, worked collaboratively with team, implemented efficient algorithms for robot control",
+          "result": "Earned 5th place and Excellence Award, demonstrating technical competence and competitive programming abilities"
+        }
+      ],
+      "technical_skills_used": ["Python", "Robotics programming", "Competitive problem-solving"],
+      "leadership_examples": ["School representation", "Team collaboration in high-pressure environment"]
+    }
+  ],
+  "skills": {
+    "technical": {
+      "programming_languages": [
+        {"language": "JavaScript", "years": 2, "proficiency": "Advanced", "frameworks": ["React", "Node.js", "Express"]},
+        {"language": "TypeScript", "years": 2, "proficiency": "Advanced", "frameworks": ["Next.js 15", "React"]},
+        {"language": "Python", "years": 5, "proficiency": "Intermediate", "frameworks": ["VEX IQ Robotics"]},
+        {"language": "Java", "years": 1, "proficiency": "Intermediate", "frameworks": []},
+        {"language": "C++", "years": 1, "proficiency": "Beginner", "frameworks": []},
+        {"language": "PHP", "years": 1, "proficiency": "Beginner", "frameworks": []}
+      ],
+      "databases": ["PostgreSQL (Prisma ORM)", "Upstash Vector", "Upstash Redis"],
+      "cloud_platforms": ["Vercel (deployment & hosting)", "Git/GitHub"],
+      "frontend": ["React", "Next.js 15", "Tailwind CSS", "Framer Motion", "HTML/CSS"],
+      "backend": ["Node.js", "Express", "REST APIs", "Prisma ORM"],
+      "ai_ml": ["RAG systems", "Vector databases (Upstash)", "LLM integration (Groq AI)", "Vercel AI SDK"]
+    },
+    "soft_skills": ["Problem-solving", "Self-directed learning", "International competition experience", "Team collaboration", "Clean code practices", "Documentation"],
+    "certifications": []
+  },
+  "education": {
+    "university": "St. Paul University Philippines",
+    "degree": "Bachelor of Science in Information Technology",
+    "graduation_year": "Expected 2027",
+    "location": "Tuguegarao City, Philippines",
+    "status": "Currently enrolled (2023 - Present)",
+    "relevant_coursework": ["Web Development", "Programming", "Database Systems", "Software Engineering"],
+    "previous_education": "Completed Basic Education at St. Paul University Philippines (2016-2023) with robotics competition experience"
+  },
+  "projects_portfolio": [
+    {
+      "name": "AI-Powered Portfolio with RAG System",
+      "description": "Modern portfolio website featuring an AI assistant powered by RAG (Retrieval-Augmented Generation) for answering professional queries. Built with Next.js 15, Groq AI, and Upstash Vector database.",
+      "technologies": ["Next.js 15", "TypeScript", "Groq AI (llama-3.1-8b-instant)", "Upstash Vector", "Upstash Redis", "Vercel AI SDK", "Tailwind CSS"],
+      "impact": "Demonstrates advanced AI integration capabilities and modern full-stack development skills",
+      "github_url": "https://github.com/marcos-njp/my-portfolio",
+      "live_demo": "https://my-portfolio-marcos-njp.vercel.app",
+      "key_features": ["RAG system for intelligent responses", "STAR methodology structured data", "Real-time AI chat", "Dark/light mode", "Responsive design"]
+    },
+    {
+      "name": "Person Search - OAuth Secured App",
+      "description": "Full-stack Next.js application with Google OAuth authentication, Prisma ORM, and PostgreSQL database. Features protected routes and comprehensive CRUD operations.",
+      "technologies": ["Next.js 15", "OAuth", "Prisma", "PostgreSQL", "TypeScript", "Tailwind CSS"],
+      "impact": "Production-ready application demonstrating secure authentication and database management",
+      "github_url": "https://github.com/marcos-njp/person-search",
+      "live_demo": "https://person-search-marcos-njp.vercel.app",
+      "key_features": ["Google OAuth integration", "Protected routes", "Database CRUD operations", "Security best practices"]
+    },
+    {
+      "name": "Modern Portfolio Website",
+      "description": "Responsive portfolio showcasing work, skills, and experience. Features dark/light mode, smooth animations, and optimized performance.",
+      "technologies": ["Next.js 15", "TypeScript", "Framer Motion", "Tailwind CSS", "next-themes"],
+      "impact": "Professional web presence with distinctive minimalist design",
+      "github_url": "https://github.com/marcos-njp/my-cv",
+      "live_demo": "https://my-cv-marcos-njp.vercel.app",
+      "key_features": ["Theme switching", "Smooth animations", "Responsive design", "Performance optimized"]
+    }
+  ],
+  "career_goals": {
+    "short_term": "Secure internship or entry-level full-stack developer position to gain professional experience",
+    "long_term": "Become a senior full-stack developer specializing in AI-powered applications",
+    "learning_focus": ["Advanced AI/ML integration", "Cloud architecture", "System design", "Open-source contribution"],
+    "industries_interested": ["Tech Startups", "AI/ML Companies", "Web Development Agencies", "SaaS Products"]
+  },
+  "interview_prep": {
+    "common_questions": {
+      "behavioral": [
+        "Tell me about your robotics competition experience and what you learned",
+        "Describe a challenging project you built and how you overcame obstacles",
+        "How do you stay current with new technologies and frameworks?",
+        "What motivates you as a developer?"
+      ],
+      "technical": [
+        "Explain your approach to building a full-stack application from scratch",
+        "How would you implement authentication in a Next.js application?",
+        "Walk me through how RAG systems work and your implementation",
+        "What's your experience with databases and ORMs like Prisma?"
+      ],
+      "situational": [
+        "If you encountered a bug in production, what would be your approach?",
+        "How would you approach learning a completely new technology for a project?",
+        "Describe how you would optimize a slow-loading web application"
+      ],
+      "company_research": {
+        "research_areas": ["Company products and services", "Tech stack used", "Company culture and values", "Recent news and achievements"],
+        "preparation_questions": ["What excites you about our company?", "Why web development?", "What are your salary expectations?", "Where do you see yourself in 5 years?"]
+      }
+    },
+    "weakness_mitigation": [
+      {
+        "weakness": "Limited professional work experience",
+        "mitigation": "Compensated with strong self-directed learning, multiple deployed projects, and proven competition success. Quick learner demonstrated through rapid technology adoption in projects."
+      },
+      {
+        "weakness": "Still learning advanced system architecture",
+        "mitigation": "Actively studying through building projects, implementing AI systems, and following best practices. Strong foundation in modern frameworks provides good basis for growth."
+      }
+    ]
+  },
+  "professional_development": {
+    "recent_learning": ["RAG systems implementation", "Vector databases (Upstash)", "Groq AI integration", "OAuth flows", "Prisma ORM", "Next.js 15 features"],
+    "learning_resources": ["Online documentation", "GitHub repositories", "Technical blogs", "Video tutorials"],
+    "future_learning": ["Advanced TypeScript patterns", "System design", "Cloud platforms (AWS/Azure)", "Testing frameworks", "CI/CD pipelines"],
+    "open_source": ["Active on GitHub with public repositories", "Shares code and learning through projects"]
+  },
+  "achievements_metrics": {
+    "competition_achievements": [
+      "4th place internationally among 118 teams (STEAM Challenge 2018)",
+      "5th place nationally among 43 schools (Robothon 2018)",
+      "International representation for Team Philippines"
+    ],
+    "technical_achievements": [
+      "3+ deployed production applications on Vercel",
+      "Implemented functional RAG system with vector database",
+      "Built secure OAuth authentication from scratch",
+      "Created responsive designs with 100% mobile compatibility"
+    ],
+    "personal_metrics": [
+      "2+ years of active web development",
+      "5+ years of programming experience (starting with Python robotics)",
+      "100+ GitHub commits across projects",
+      "Multiple technology stacks mastered (Next.js, React, TypeScript, etc.)"
+    ]
+  }
+}
