@@ -45,7 +45,7 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2
       ai:
-        specifier: ^5.0.90
+        specifier: ^5.0.92
         version: 5.0.92(zod@4.1.12)
       aos:
         specifier: ^2.3.4

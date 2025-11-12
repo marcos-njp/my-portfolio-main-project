@@ -20,7 +20,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   const [messages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "🚧 This AI assistant is still under development, but it's getting there! The database is all set up and ready. Stay tuned for updates! 🚀",
+      content: "🚧 AI Chat Assistant coming soon! Currently testing the RAG system in Python. Stay tuned for the web version! 🚀",
       timestamp: new Date()
     }
   ])
