@@ -819,6 +819,89 @@
           "backend"
         ]
       }
+    },
+    {
+      "id": "chunk_26",
+      "title": "Learning Style & Growth Mindset",
+      "type": "personal_attributes",
+      "content": "Learning Approach: I'm a hands-on learner - I learn best by building real projects, not just watching tutorials. When I wanted to learn OAuth, I didn't just read docs - I built a full auth system from scratch. Same with AI/RAG - I built this digital twin to understand vector databases deeply. Documentation Philosophy: I document everything I learn because teaching others reinforces my understanding. My GitHub repos include detailed READMEs and code comments because I've been that confused developer reading unclear docs. Continuous Improvement: I actively seek feedback and iterate. For example, I rebuilt my portfolio 3 times until the design felt right. Each project teaches me something that improves the next one. Challenge Seeking: I deliberately choose projects slightly above my skill level - that's how I grow fastest. Building a RAG system was intimidating, but pushing through taught me more than 10 tutorials would have. Tech Community Engagement: I participate in coding communities, share solutions to problems I've solved, and stay updated with tech trends through dev.to, Hacker News, and Twitter tech spaces.",
+      "metadata": {
+        "category": "personal_attributes",
+        "tags": [
+          "learning_style",
+          "growth_mindset",
+          "self_improvement",
+          "documentation",
+          "community"
+        ]
+      }
+    },
+    {
+      "id": "chunk_27",
+      "title": "Problem-Solving Approach & Debugging Style",
+      "type": "personal_attributes",
+      "content": "Debugging Philosophy: I actually enjoy debugging - it's like detective work. I use systematic approaches: console.log everything, isolate the problem, read error messages carefully, check documentation, then Stack Overflow if needed. I don't just copy-paste solutions - I understand WHY they work. Problem-Solving Process: Break down complex problems into smaller pieces. For example, when building the RAG system, I tackled vector embeddings first, then semantic search, then integrated with the chat interface. Step by step, not everything at once. Research Skills: When stuck, I know how to find answers - official docs first, then GitHub issues, then community forums. I've learned to read source code when documentation is unclear. Time Management: I'm honest about timelines - I'd rather underpromise and overdeliver. If something will take 2 days, I say 3 days and deliver early with extras. Error Handling: I build defensively - add error handling, validation, edge case checks. My projects don't just work in happy paths - they handle failures gracefully with helpful error messages.",
+      "metadata": {
+        "category": "personal_attributes",
+        "tags": [
+          "problem_solving",
+          "debugging",
+          "research",
+          "time_management",
+          "error_handling"
+        ]
+      }
+    },
+    {
+      "id": "chunk_28",
+      "title": "Collaboration Style & Team Dynamics",
+      "type": "personal_attributes",
+      "content": "Communication Style: I explain technical concepts clearly - I've helped classmates debug their code by breaking problems into simple terms. I document my code well because future me (and teammates) will thank me later. Feedback Reception: I actively seek code reviews and feedback. When someone suggests a better approach, I ask 'why?' to understand their reasoning, not defend my code. Learning from others makes me better. Git Workflow: Clean commits, meaningful messages, proper branching. I learned this the hard way by having messy histories and now understand why it matters for team collaboration. Open Source Mindset: All my projects are public on GitHub - I'm not afraid to show work-in-progress code. Transparency over perfection. If someone finds bugs or suggests improvements, that's free learning. Remote Collaboration: Comfortable with async communication - clear written updates, thorough documentation, responsive to messages. I know how to unblock myself but also when to ask for help. Cultural Fit: I thrive in environments that value learning, experimentation, and kind feedback. I want teammates who push me to grow, not just tell me what to do.",
+      "metadata": {
+        "category": "personal_attributes",
+        "tags": [
+          "collaboration",
+          "communication",
+          "team_dynamics",
+          "feedback",
+          "remote_work",
+          "git"
+        ]
+      }
+    },
+    {
+      "id": "chunk_29",
+      "title": "Technical Interests & Future Learning Goals",
+      "type": "career_goals",
+      "content": "Current Obsessions: I'm fascinated by AI/ML integration in web apps - not just using APIs, but understanding RAG systems, vector databases, embeddings, and prompt engineering. Building this digital twin taught me more about AI than any course could. Next on My List: I want to dive deeper into backend architecture - microservices, caching strategies (Redis, which I'm using but want to master), database optimization, API design patterns. I'm interested in how apps scale from 100 to 1 million users. Technologies I'm Eyeing: Exploring Rust for performance-critical code, Go for backend services, and more advanced Next.js patterns (Server Actions, Partial Prerendering). Also interested in DevOps - Docker, CI/CD, infrastructure as code. Why Full Stack: I love seeing both sides - designing a beautiful UI AND architecting the backend that powers it. Understanding the full picture makes me better at both. Long-term Vision: I want to build products that people actually use and love. Not just technically impressive - genuinely helpful. Think tools that make developers' lives easier or apps that solve real problems elegantly. Industries I'm Drawn To: Developer tools, AI-powered apps, education tech, productivity software. Anything where I can combine technical depth with real user impact.",
+      "metadata": {
+        "category": "career_goals",
+        "tags": [
+          "technical_interests",
+          "learning_goals",
+          "future_plans",
+          "ai_ml",
+          "backend",
+          "full_stack"
+        ]
+      }
+    },
+    {
+      "id": "chunk_30",
+      "title": "Real Talk - Strengths, Weaknesses & Self-Awareness",
+      "type": "personal_attributes",
+      "content": "My Genuine Strengths: I pick up new technologies fast - I went from zero to deployed Next.js apps in weeks. I'm resourceful when stuck, I actually read documentation (shocking, I know), and I'm not afraid to ask questions when I need help. I genuinely enjoy coding and building things, which means I work on projects outside school for fun, not obligation. What I'm Still Learning: I haven't worked on a large production codebase with multiple developers yet. My biggest projects are solo, so I'm eager to learn real-world team workflows, code review practices, and how professional teams handle complexity at scale. I've built apps, but haven't experienced the full software development lifecycle with QA, staging, production deployments, and user feedback loops. Honest Self-Assessment: I'm technically skilled for a student but I know I have tons to learn from experienced developers. I'm the kind of person who will read your team's entire codebase in week one to understand how everything works. I'm not coming in claiming to be a senior dev - I'm coming in ready to soak up knowledge like a sponge while contributing real value where I can. What Motivates Me: I want to work on projects where the code I write actually matters - where bugs I fix help real users, where features I build get used. I'm motivated by growth, interesting technical challenges, and being around people smarter than me who I can learn from. Why I'm Different: Most students apply with only classroom projects. I've built production apps, handled real deployment issues, dealt with authentication bugs at 2am, and learned from actual user-facing work. I've tasted real development and I want more of it.",
+      "metadata": {
+        "category": "personal_attributes",
+        "tags": [
+          "strengths",
+          "weaknesses",
+          "self_awareness",
+          "motivation",
+          "honest_assessment",
+          "work_ethic"
+        ]
+      }
     }
   ]
 }
