@@ -1,12 +1,18 @@
 import { createGroq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
-import { validateQuery, enhanceQuery, isMetaQuery } from '@/lib/query-validator';
+import { validateQuery, enhanceQuery, isMetaQuery, type ValidationResult } from '@/lib/query-validator';
 import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
 import { findRelevantFAQs } from '@/lib/interviewer-faqs';
 import { preprocessQuery } from '@/lib/query-preprocessor';
 import { getResponseLengthInstruction } from '@/lib/response-manager';
 import { getMoodConfig, type AIMood } from '@/lib/ai-moods';
+import { 
+  saveConversationHistory, 
+  loadConversationHistory, 
+  buildConversationContext,
+  type SessionMessage 
+} from '@/lib/session-memory';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -52,7 +58,7 @@ KEY ACHIEVEMENTS:
 - 🏆 4th place internationally (118 teams, 5 countries) - STEAM Challenge 2018, Programming Skills Excellence
 - 🥈 5th place nationally (43 schools) - Robothon 2018, Excellence Award
 - 🚀 3+ deployed production applications on Vercel
-- 🤖 Built functional RAG system with >82% relevance accuracy using Groq AI + Upstash Vector
+- 🤖 Built functional RAG system with 75% relevance threshold using Groq AI + Upstash Vector
 
 TECHNICAL EXPERTISE:
 - Frontend: Next.js 15, React, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion
@@ -79,14 +85,19 @@ RESPONSE GUIDELINES:
 
 export async function POST(req: Request) {
   try {
-    const { messages, mood = 'professional' } = await req.json() as { 
+    const { messages, mood = 'professional', sessionId } = await req.json() as { 
       messages: Message[];
       mood?: AIMood;
+      sessionId?: string;
     };
     
     // Get the latest user message
     const lastMessage = messages[messages.length - 1];
     const userQuery = lastMessage.content;
+
+    // ========== LOAD SESSION HISTORY ==========
+    const sessionHistory = sessionId ? await loadConversationHistory(sessionId) : [];
+    const conversationContext = buildConversationContext(sessionHistory);
 
     // ========== STEP 0: Preprocess Query (Fix Typos) ==========
     const preprocessed = preprocessQuery(userQuery);
@@ -97,20 +108,31 @@ export async function POST(req: Request) {
       console.log(`[Typo Fix] Original: "${userQuery}" → Corrected: "${cleanQuery}" (${preprocessed.changes.join(', ')})`);
     }
 
-    // ========== STEP 1: Validate Query ==========
-    const validation = validateQuery(cleanQuery);
+    // ========== STEP 1: Validate Query (SKIP for follow-ups with context) ==========
+    const isShortFollowUp = cleanQuery.length < 15 && sessionHistory.length > 0;
+    const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
+    const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
     
-    if (!validation.isValid) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'invalid_query',
-          message: validation.reason || "Please ask about my professional background, skills, or projects."
-        }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+    let validation: ValidationResult = { isValid: true, reason: '', category: 'follow-up', confidence: 1.0 };
+    
+    // Only validate if NOT a short follow-up with conversation history
+    if (!isShortFollowUp && !isFollowUpResponse) {
+      validation = validateQuery(cleanQuery);
+      
+      if (!validation.isValid) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'invalid_query',
+            message: validation.reason || "Please ask about my professional background, skills, or projects."
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    } else if (isFollowUpResponse && sessionHistory.length > 0) {
+      console.log(`[Follow-Up] Detected follow-up response: "${cleanQuery}" - skipping validation, using context`);
     }
 
     // ========== STEP 2: Check FAQ Database First ==========
@@ -164,9 +186,21 @@ export async function POST(req: Request) {
     
     const result = streamText({
       model: groq('llama-3.1-8b-instant'),
-      system: SYSTEM_PROMPT + contextInfo + '\n\n' + responseLengthGuidelines + '\n\n' + moodConfig.systemPromptAddition,
+      system: SYSTEM_PROMPT + conversationContext + contextInfo + '\n\n' + responseLengthGuidelines + '\n\n' + moodConfig.systemPromptAddition,
       messages,
       temperature: moodConfig.temperature,
+      onFinish: async ({ text }) => {
+        // Save conversation history after AI responds
+        if (sessionId) {
+          const updatedHistory: SessionMessage[] = [
+            ...sessionHistory,
+            { role: 'user', content: userQuery, timestamp: Date.now(), mood },
+            { role: 'assistant', content: text, timestamp: Date.now(), mood },
+          ];
+          
+          await saveConversationHistory(sessionId, updatedHistory, mood);
+        }
+      },
     });
 
     return result.toTextStreamResponse();

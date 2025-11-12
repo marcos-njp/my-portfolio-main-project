@@ -1,0 +1,147 @@
+/**
+ * ROBUST Session Memory System with Upstash Redis
+ * Maintains conversation history for context-aware responses
+ * Minimum 8-prompt memory with automatic cleanup
+ */
+
+import { Redis } from '@upstash/redis';
+
+// Initialize Redis client
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export interface SessionMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+  mood?: string; // Track mood for each message
+}
+
+export interface SessionData {
+  messages: SessionMessage[];
+  sessionId: string;
+  createdAt: number;
+  lastActive: number;
+  mood: string; // Current session mood
+}
+
+const MAX_HISTORY = 16; // Keep last 16 messages (8 exchanges) for robust context
+const SESSION_TTL = 3600; // 1 hour TTL
+
+/**
+ * Generate session ID from browser fingerprint or create new one
+ */
+export function generateSessionId(): string {
+  return `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+}
+
+/**
+ * Save conversation history to Redis
+ */
+export async function saveConversationHistory(
+  sessionId: string,
+  messages: SessionMessage[],
+  mood: string = 'professional'
+): Promise<void> {
+  try {
+    // Keep only the last MAX_HISTORY messages
+    const trimmedMessages = messages.slice(-MAX_HISTORY);
+    
+    const sessionData: SessionData = {
+      messages: trimmedMessages,
+      sessionId,
+      createdAt: Date.now(),
+      lastActive: Date.now(),
+      mood,
+    };
+
+    // Save to Redis with TTL
+    await redis.setex(
+      `chat_session:${sessionId}`,
+      SESSION_TTL,
+      JSON.stringify(sessionData)
+    );
+
+    console.log(`[Session Memory] Saved ${trimmedMessages.length} messages for session ${sessionId}`);
+  } catch (error) {
+    console.error('[Session Memory] Failed to save:', error);
+    // Non-blocking: continue even if Redis fails
+  }
+}
+
+/**
+ * Load conversation history from Redis
+ */
+export async function loadConversationHistory(
+  sessionId: string
+): Promise<SessionMessage[]> {
+  try {
+    const data = await redis.get<string>(`chat_session:${sessionId}`);
+    
+    if (!data) {
+      console.log(`[Session Memory] No history found for session ${sessionId}`);
+      return [];
+    }
+
+    const sessionData = JSON.parse(data) as SessionData;
+    console.log(`[Session Memory] Loaded ${sessionData.messages.length} messages for session ${sessionId}`);
+    
+    return sessionData.messages;
+  } catch (error) {
+    console.error('[Session Memory] Failed to load:', error);
+    return [];
+  }
+}
+
+/**
+ * Clear session history
+ */
+export async function clearSessionHistory(sessionId: string): Promise<void> {
+  try {
+    await redis.del(`chat_session:${sessionId}`);
+    console.log(`[Session Memory] Cleared session ${sessionId}`);
+  } catch (error) {
+    console.error('[Session Memory] Failed to clear:', error);
+  }
+}
+
+/**
+ * Get session mood
+ */
+export async function getSessionMood(sessionId: string): Promise<string> {
+  try {
+    const data = await redis.get<string>(`chat_session:${sessionId}`);
+    
+    if (!data) return 'professional';
+
+    const sessionData = JSON.parse(data) as SessionData;
+    return sessionData.mood || 'professional';
+  } catch (error) {
+    console.error('[Session Memory] Failed to get mood:', error);
+    return 'professional';
+  }
+}
+
+/**
+ * Build context from conversation history
+ */
+export function buildConversationContext(messages: SessionMessage[]): string {
+  if (messages.length === 0) return '';
+
+  // Get last 8 exchanges (16 messages) for robust context
+  const recentMessages = messages.slice(-MAX_HISTORY);
+  
+  let context = '\n\n=== CONVERSATION HISTORY ===\n';
+  
+  recentMessages.forEach((msg, idx) => {
+    const speaker = msg.role === 'user' ? 'User' : 'Assistant';
+    context += `${speaker}: ${msg.content}\n`;
+  });
+  
+  context += '=== END HISTORY ===\n\n';
+  context += 'IMPORTANT: Use this conversation history to maintain context and provide coherent follow-up responses. If the user says "yes", "sure", "tell me more", etc., refer to the previous assistant message to understand what they\'re agreeing to or asking about.\n';
+  
+  return context;
+}

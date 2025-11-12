@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAllMoods, type AIMood } from "@/lib/ai-moods";
-import { X, Sparkles, Send, Loader2, User } from "lucide-react"
+import { X, Sparkles, Send, Loader2, User } from "lucide-react";
 
 interface Message {
-  id: string
-  role: "user" | "assistant"
-  content: string
+  id: string;
+  role: "user" | "assistant";
+  content: string;
 }
 
 interface ChatSidebarProps {
@@ -25,33 +25,43 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       role: "assistant",
       content: "Hi! I'm Niño's AI digital twin, powered by advanced RAG technology. Ask me about his technical skills, projects, education, achievements, or career goals. I'm trained on 50+ common interview questions!",
     },
-  ])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentMood, setCurrentMood] = useState<AIMood>("professional")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentMood, setCurrentMood] = useState<AIMood>("professional");
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(7)}`);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get all available moods
-  const moods = getAllMoods()
+  const moods = getAllMoods();
+
+  console.log(`[Session] ID: ${sessionId}, Mood: ${currentMood}`);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Log mood changes
+  useEffect(() => {
+    console.log(`[Mood Change] New mood: ${currentMood}`);
+  }, [currentMood]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || isLoading) return
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input.trim(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setIsLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    console.log(`[API Call] Sending with mood: ${currentMood}, sessionId: ${sessionId}`);
 
     try {
       const response = await fetch("/api/chat", {
@@ -63,8 +73,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
             content: m.content,
           })),
           mood: currentMood, // Pass current mood to API
+          sessionId: sessionId, // Pass session ID for memory
         }),
-      })
+      });
 
       // Handle validation errors (400 status)
       if (response.status === 400) {
@@ -91,25 +102,27 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: "",
-      }
-      setMessages((prev) => [...prev, assistantMessage])
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
 
       while (reader) {
-        const { done, value } = await reader.read()
-        if (done) break
+        const { done, value } = await reader.read();
+        if (done) break;
 
         // Decode the chunk as plain text (toTextStreamResponse sends plain text)
-        const text = decoder.decode(value, { stream: true })
-        aiResponse += text
+        const text = decoder.decode(value, { stream: true });
+        aiResponse += text;
         
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMessage.id ? { ...m, content: aiResponse } : m
           )
-        )
+        );
       }
+
+      console.log(`[Response Complete] Mood was: ${currentMood}`);
     } catch (error) {
-      console.error("Chat error:", error)
+      console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -117,11 +130,11 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
           role: "assistant",
           content: "Sorry, I encountered an error. Please try again.",
         },
-      ])
+      ]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Suggested questions - Common interviewer questions
   const suggestions = [
@@ -132,15 +145,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   ]
 
   const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion)
+    setInput(suggestion);
     setTimeout(() => {
-      const form = document.querySelector("form")
+      const form = document.querySelector("form");
       if (form) {
-        const event = new Event("submit", { bubbles: true, cancelable: true })
-        form.dispatchEvent(event)
+        const event = new Event("submit", { bubbles: true, cancelable: true });
+        form.dispatchEvent(event);
       }
-    }, 100)
-  }
+    }, 100);
+  };
 
   return (
     <>

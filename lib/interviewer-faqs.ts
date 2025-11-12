@@ -68,7 +68,7 @@ export const INTERVIEWER_FAQS: FAQ[] = [
     category: "technical",
     question: "Do you have experience with AI/Machine Learning?",
     keywords: ["ai", "machine learning", "ml", "artificial intelligence", "ai experience"],
-    response: "Yes, I've built a production RAG (Retrieval-Augmented Generation) system using Groq AI with the llama-3.1-8b-instant model and Upstash Vector for semantic search. This powers my AI digital twin that answers professional queries with >82% relevance accuracy. I understand vector embeddings, semantic search, prompt engineering, and LLM integration patterns. I'm eager to expand my ML knowledge further.",
+    response: "Yes, I've built a production RAG (Retrieval-Augmented Generation) system using Groq AI with the llama-3.1-8b-instant model and Upstash Vector for semantic search. This powers my AI digital twin that answers professional queries with a 0.75 relevance threshold for optimal accuracy. I understand vector embeddings, semantic search, prompt engineering, and LLM integration patterns. I'm eager to expand my ML knowledge further.",
     relevance_boost: 0.88
   },
 
@@ -84,7 +84,7 @@ export const INTERVIEWER_FAQS: FAQ[] = [
     category: "projects",
     question: "What's your most challenging project?",
     keywords: ["challenging project", "difficult project", "hardest project", "complex project"],
-    response: "Building the AI-powered RAG system for my digital twin portfolio. Challenges included: optimizing vector search for >82% relevance accuracy, implementing streaming responses with proper error handling, managing state across server/client components in Next.js, and integrating multiple services (Groq AI, Upstash Vector, Redis caching) while maintaining performance. I solved these through systematic testing, documentation review, and iterative optimization.",
+    response: "Building the AI-powered RAG system for my digital twin portfolio. Challenges included: optimizing vector search with 0.75 relevance threshold for balanced accuracy, implementing streaming responses with proper error handling, managing state across server/client components in Next.js, and integrating multiple services (Groq AI, Upstash Vector, Redis caching) while maintaining performance. I solved these through systematic testing, documentation review, and iterative optimization.",
     relevance_boost: 0.9
   },
   {
@@ -100,7 +100,7 @@ export const INTERVIEWER_FAQS: FAQ[] = [
     category: "achievements",
     question: "What are your biggest achievements?",
     keywords: ["achievements", "accomplishments", "awards", "recognition", "proud of"],
-    response: "🏆 4th place internationally in STEAM Challenge 2018 (118 teams, 5 countries) for Programming Skills Excellence. 🥈 5th place nationally in Robothon 2018 (43 schools) with Excellence Award. 🚀 Successfully deployed 3+ production applications while still a student. 🤖 Built a functional RAG system achieving >82% relevance accuracy. These demonstrate my technical skills, competitive ability, and commitment to continuous learning.",
+    response: "🏆 4th place internationally in STEAM Challenge 2018 (118 teams, 5 countries) for Programming Skills Excellence. 🥈 5th place nationally in Robothon 2018 (43 schools) with Excellence Award. 🚀 Successfully deployed 3+ production applications while still a student. 🤖 Built a functional RAG system with 0.75 relevance threshold. These demonstrate my technical skills, competitive ability, and commitment to continuous learning.",
     relevance_boost: 0.95
   },
   {
