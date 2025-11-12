@@ -902,6 +902,25 @@
           "work_ethic"
         ]
       }
+    },
+    {
+      "id": "chunk_31",
+      "title": "Tech Communities & Interests - Data-Driven Focus",
+      "type": "professional_development",
+      "content": "Microsoft Developer Resources: I follow Microsoft's developer blogs and documentation to stay updated on Azure, TypeScript, and modern web development practices. Their technical content helps me understand enterprise-level patterns and cloud architecture. Amazon Web Services (AWS): I keep up with AWS announcements and learning resources because cloud infrastructure is essential for modern applications. Understanding AWS services gives me insight into how production systems scale and operate. Data Analytics & Statistics: I have a genuine interest in data analytics and statistics because they're crucial for understanding user trends, application performance, and making data-driven decisions. Numbers tell the real story of how users interact with products. Statistics helps me interpret metrics meaningfully, spot patterns, and make informed technical decisions. Whether it's analyzing API response times, user behavior patterns, or A/B test results, I love using data to drive improvements. GitHub & Stack Overflow: I use GitHub for learning from open-source projects and Stack Overflow when I need solutions to specific technical problems. These are my go-to resources for practical, community-driven knowledge.",
+      "metadata": {
+        "category": "professional_development",
+        "tags": [
+          "tech_resources",
+          "microsoft",
+          "aws",
+          "data_analytics",
+          "statistics",
+          "github",
+          "stackoverflow",
+          "learning"
+        ]
+      }
     }
   ]
 }
