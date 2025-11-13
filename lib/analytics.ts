@@ -1,22 +1,21 @@
 /**
  * Analytics Logger for Digital Twin Chat
  * Tracks user questions and AI responses to Neon Postgres
+ * 
+ * NOTE: This file should only be imported in Node.js runtime (not Edge)
+ * The chat API calls /api/analytics/log via fetch to avoid Edge runtime issues
  */
 
 import { PrismaClient } from '@prisma/client';
 
-const prismaClientSingleton = () => {
-  return new PrismaClient();
+// Prisma client singleton pattern
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
 };
 
-declare global {
-  // eslint-disable-next-line no-var
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
-}
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
-
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export interface ChatLogData {
   sessionId: string;
@@ -99,5 +98,3 @@ function categorizeQuestion(question: string): string {
   
   return 'general';
 }
-
-export { prisma };
