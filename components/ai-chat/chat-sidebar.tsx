@@ -153,26 +153,17 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('0:')) {
-            const textPart = line.substring(3).trim();
-            if (textPart.startsWith('"') && textPart.endsWith('"')) {
-              const cleanedText = textPart.slice(1, -1).replace(/\\n/g, '\n');
-              aiResponse += cleanedText;
-              setMessages((prev) => {
-                const newMessages = [...prev];
-                const lastMessage = newMessages[newMessages.length - 1];
-                if (lastMessage.role === 'assistant') {
-                  lastMessage.content = aiResponse;
-                }
-                return newMessages;
-              });
-            }
+        const chunk = decoder.decode(value, { stream: true });
+        aiResponse += chunk;
+        
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          if (lastMessage.role === 'assistant') {
+            lastMessage.content = aiResponse;
           }
-        }
+          return newMessages;
+        });
       }
 
       console.log('[API Call] ✅ Full response:', aiResponse);
