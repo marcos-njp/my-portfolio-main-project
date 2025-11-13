@@ -28,6 +28,7 @@ model ChatLog {
   @@index([sessionId])
   @@index([timestamp])
   @@index([mood])
+  @@map("ChatLog")
 }
 
 // Track most frequently asked questions
@@ -40,4 +41,5 @@ model FrequentQuestion {
   
   @@index([category])
   @@index([count(sort: Desc)])
+  @@map("FrequentQuestion")
 }
