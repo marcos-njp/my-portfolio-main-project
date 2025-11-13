@@ -222,6 +222,8 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       ]);
       setIsLoading(false);
     }
+  };
+
   const handleComment = (messageId: string, comment: string, rating: 'positive' | 'neutral') => {
     setMessages((prev) =>
       prev.map((msg) =>
@@ -229,8 +231,13 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       )
     );
 
-    // Send comment as follow-up context to AI
-    const aiResponse = `Thank you for the feedback! ${comment} I'm glad that was helpful. What else would you like to know?`;
+    // AI responds to recruiter feedback naturally
+    let aiResponse = "";
+    if (rating === 'positive') {
+      aiResponse = `Thank you so much! I'm happy I could help you. ${comment.includes('wonderful') || comment.includes('great') ? "I appreciate your kind words!" : ""} What else would you like to know about the portfolio?`;
+    } else {
+      aiResponse = `I appreciate your feedback. I'm sorry if my response wasn't perfect - I'm still under development and my intelligence is limited. I'll do my best to improve! Is there something specific I can clarify or expand on?`;
+    }
     
     setMessages((prev) => [
       ...prev,
@@ -241,7 +248,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       },
     ]);
 
-    console.log('[Comment] Recruiter feedback:', { messageId, comment, rating });
+    console.log('[Comment] Recruiter feedback (NOT recorded in DB):', { messageId, comment, rating });
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -251,8 +258,6 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       if (form) {
         form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
       }
-    }, 100);
-  };  }
     }, 100);
   };
 
@@ -275,20 +280,10 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className="group">
-                <ChatMessage role={message.role} content={message.content} />
-                {message.role === "assistant" && !message.comment && message.content && (
-                  <CommentInput messageId={message.id} onComment={handleComment} />
-                )}
-                {message.comment && (
-                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs border-l-2 border-green-500">
-                    <span className="text-green-700 dark:text-green-300">💬 {message.comment}</span>
-                  </div>
-                )}
-              </div>
-            ))}   <h2 className="text-base font-semibold">AI Digital Twin</h2>
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold">AI Digital Twin</h2>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                     Online • Powered by Groq AI
@@ -309,7 +304,17 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
-              <ChatMessage key={message.id} role={message.role} content={message.content} />
+              <div key={message.id} className="group">
+                <ChatMessage role={message.role} content={message.content} />
+                {message.role === "assistant" && !message.comment && message.content && (
+                  <CommentInput messageId={message.id} onComment={handleComment} />
+                )}
+                {message.comment && (
+                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs border-l-2 border-green-500">
+                    <span className="text-green-700 dark:text-green-300">💬 {message.comment}</span>
+                  </div>
+                )}
+              </div>
             ))}
 
             {isLoading && (

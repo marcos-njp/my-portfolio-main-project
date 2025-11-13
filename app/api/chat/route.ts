@@ -382,14 +382,17 @@ export async function POST(req: Request) {
           
           await saveConversationHistory(sessionId, updatedHistory, mood, feedbackPreferences);
           
-          // Log analytics asynchronously (completely non-blocking)
+          // Log analytics asynchronously - ONLY user questions and AI responses (NOT comments)
           Promise.resolve().then(async () => {
             try {
-              const analyticsUrl = process.env.NODE_ENV === 'production' 
-                ? '/api/analytics/log' 
-                : 'http://localhost:3000/api/analytics/log';
+              // Use absolute URL for Vercel deployment
+              const baseUrl = process.env.VERCEL_URL 
+                ? `https://${process.env.VERCEL_URL}` 
+                : 'http://localhost:3000';
               
-              const response = await fetch(analyticsUrl, {
+              console.log('[Analytics] 📤 Sending to:', `${baseUrl}/api/analytics/log`);
+              
+              const response = await fetch(`${baseUrl}/api/analytics/log`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -404,9 +407,10 @@ export async function POST(req: Request) {
               });
               
               if (response.ok) {
-                console.log('[Analytics] ✅ Logged successfully');
+                console.log('[Analytics] ✅ Logged successfully to database');
               } else {
-                console.error('[Analytics] ❌ Failed with status:', response.status);
+                const errorText = await response.text();
+                console.error('[Analytics] ❌ Failed with status:', response.status, errorText);
               }
             } catch (err) {
               console.error('[Analytics] ❌ Network error:', err);
