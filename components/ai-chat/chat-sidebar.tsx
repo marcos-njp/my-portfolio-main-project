@@ -183,12 +183,29 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage.role === 'assistant' && lastMessage.content === "💭 Thinking...") {
+          if (lastMessage.role === 'assistant') {
             lastMessage.content = errorData.message || "Please ask about my professional background, skills, or projects.";
           }
           return newMessages;
         });
         setIsLoading(false);
+        setAbortController(null);
+        return;
+      }
+
+      if (response.status === 429) {
+        // Groq API rate limit hit
+        console.error('[API Error] Rate limit exceeded');
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          if (lastMessage.role === 'assistant') {
+            lastMessage.content = "⏸️ I'm getting too many requests right now. Please wait a moment and try again in 30 seconds.";
+          }
+          return newMessages;
+        });
+        setIsLoading(false);
+        setAbortController(null);
         return;
       }
 
@@ -199,12 +216,13 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage.role === 'assistant' && lastMessage.content === "💭 Thinking...") {
+          if (lastMessage.role === 'assistant') {
             lastMessage.content = `⚠️ Server error: ${errorData.message || 'Failed to generate response'}${errorData.details ? `\n\nDetails: ${errorData.details}` : ''}`;
           }
           return newMessages;
         });
         setIsLoading(false);
+        setAbortController(null);
         return;
       }
 
@@ -248,18 +266,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     } catch (error) {
       console.error("[API Error]", error);
       
-      // Clear all timeouts and intervals on error
-      if (thinkingTimeout) {
-        clearTimeout(thinkingTimeout);
-        setThinkingTimeout(null);
-      }
-      if (thinkingInterval) {
-        clearInterval(thinkingInterval);
-        setThinkingInterval(null);
-      }
+      // CRITICAL: Clear ALL timeouts and intervals on error
+      clearTimeout(stage1Timeout);
+      clearTimeout(stage2Timeout);
+      clearTimeout(abortTimeout);
+      clearInterval(thinkingInterval);
       
       // Don't show error if request was aborted (timeout)
       if (error instanceof Error && error.name === 'AbortError') {
+        console.log('[Request] Aborted due to timeout');
         return;
       }
       
@@ -272,6 +287,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         },
       ]);
       setIsLoading(false);
+      setAbortController(null);
     }
   };
 

@@ -348,10 +348,31 @@ export async function POST(req: Request) {
       console.error('Error stack:', error.stack);
     }
     
+    // Check for Groq API rate limit errors
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const isRateLimit = errorMessage.includes('429') || 
+                        errorMessage.includes('rate limit') || 
+                        errorMessage.includes('Too Many Requests');
+    
+    if (isRateLimit) {
+      console.error('❌ Groq API rate limit exceeded');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'Too many requests. Please wait a moment and try again.',
+          timestamp: new Date().toISOString()
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ 
         error: 'Failed to generate response',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message: errorMessage,
         timestamp: new Date().toISOString()
       }),
       {
