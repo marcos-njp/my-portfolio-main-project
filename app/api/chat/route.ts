@@ -1,6 +1,7 @@
 import { createGroq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
+import { neon } from '@neondatabase/serverless';
 import { validateQuery, enhanceQuery, isMetaQuery, type ValidationResult } from '@/lib/query-validator';
 import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
 import { findRelevantFAQs } from '@/lib/interviewer-faqs';
@@ -392,63 +393,48 @@ export async function POST(req: Request) {
           
           await saveConversationHistory(sessionId, updatedHistory, mood, feedbackPreferences);
           
-          // Log analytics asynchronously - ONLY user questions and AI responses (NOT comments)
+          // Log analytics DIRECTLY to Neon using serverless driver (works in Edge runtime!)
           Promise.resolve().then(async () => {
             try {
-              // Use absolute URL for Vercel deployment
-              // VERCEL_URL doesn't include protocol, so we add it
-              const baseUrl = process.env.VERCEL_URL 
-                ? `https://${process.env.VERCEL_URL}` 
-                : (process.env.NEXT_PUBLIC_VERCEL_URL 
-                    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-                    : 'http://localhost:3000');
-              
-              const analyticsUrl = `${baseUrl}/api/analytics/log`;
-              
-              console.log('[Analytics] 📤 Sending to:', analyticsUrl);
-              console.log('[Analytics] 🔧 Environment check:', {
-                VERCEL_URL: process.env.VERCEL_URL ? 'SET' : 'NOT SET',
-                NODE_ENV: process.env.NODE_ENV,
-                baseUrl: baseUrl,
-              });
-              
-              const analyticsPayload = {
-                sessionId,
-                userQuery,
-                aiResponse: text,
-                mood,
-                chunksUsed: ragContext.chunksUsed,
-                topScore: ragContext.topScore,
-                avgScore: ragContext.averageScore,
-              };
-              
-              console.log('[Analytics] 📦 Payload:', JSON.stringify(analyticsPayload).substring(0, 200));
-              
-              const response = await fetch(analyticsUrl, {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(analyticsPayload),
-              });
-              
-              console.log('[Analytics] 🔄 Response status:', response.status, response.statusText);
-              
-              if (response.ok) {
-                const result = await response.json();
-                console.log('[Analytics] ✅ Logged successfully to database:', result);
-              } else {
-                const errorText = await response.text();
-                console.error('[Analytics] ❌ Failed with status:', response.status, response.statusText);
-                console.error('[Analytics] ❌ Error body:', errorText);
-                console.error('[Analytics] ❌ Request URL was:', analyticsUrl);
+              if (!process.env.DATABASE_URL) {
+                console.error('[Analytics] ❌ DATABASE_URL not set!');
+                return;
               }
+
+              console.log('[Analytics] 📝 Logging directly to Neon database...');
+              
+              const sql = neon(process.env.DATABASE_URL);
+              
+              const result = await sql`
+                INSERT INTO "ChatLog" (
+                  id,
+                  "sessionId",
+                  "userQuery",
+                  "aiResponse",
+                  mood,
+                  "chunksUsed",
+                  "topScore",
+                  "avgScore",
+                  timestamp
+                ) VALUES (
+                  gen_random_uuid(),
+                  ${sessionId},
+                  ${userQuery.substring(0, 1000)},
+                  ${text.substring(0, 10000)},
+                  ${mood},
+                  ${ragContext.chunksUsed},
+                  ${ragContext.topScore},
+                  ${ragContext.averageScore},
+                  NOW()
+                )
+              `;
+              
+              console.log('[Analytics] ✅ Successfully logged to Neon!', { sessionId, queryLength: userQuery.length, responseLength: text.length });
             } catch (err) {
-              console.error('[Analytics] ❌ Network error:', err);
+              console.error('[Analytics] ❌ Database error:', err);
               console.error('[Analytics] ❌ Error details:', {
                 name: err instanceof Error ? err.name : 'Unknown',
                 message: err instanceof Error ? err.message : String(err),
-                stack: err instanceof Error ? err.stack : undefined,
               });
             }
           });
