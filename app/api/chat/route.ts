@@ -399,73 +399,71 @@ export async function POST(req: Request) {
           console.log('[Analytics] 🔵 UserQuery length:', userQuery.length);
           console.log('[Analytics] 🔵 AI Response length:', text.length);
           
+          // CRITICAL: Use .catch() on the Promise to ensure errors are caught!
           Promise.resolve().then(async () => {
-            try {
-              console.log('[Analytics] 🟡 Inside Promise.resolve()...');
-              
-              if (!process.env.DATABASE_URL) {
-                console.error('[Analytics] ❌ DATABASE_URL not set!');
-                return;
-              }
-
-              console.log('[Analytics] 📝 DATABASE_URL is set, creating Neon SQL client...');
-              
-              const sql = neon(process.env.DATABASE_URL);
-              
-              console.log('[Analytics] 🔵 Executing INSERT query...');
-              console.log('[Analytics] 🔵 Data to insert:', {
-                sessionId,
-                userQueryLength: userQuery.length,
-                aiResponseLength: text.length,
-                mood,
-                chunksUsed: ragContext.chunksUsed,
-                topScore: ragContext.topScore,
-                avgScore: ragContext.averageScore,
-              });
-              
-              // Use unquoted column names to match Prisma's PostgreSQL naming
-              const insertResult = await sql`
-                INSERT INTO "ChatLog" (
-                  id,
-                  "sessionId",
-                  "userQuery",
-                  "aiResponse",
-                  mood,
-                  "chunksUsed",
-                  "topScore",
-                  "avgScore",
-                  timestamp
-                ) VALUES (
-                  gen_random_uuid(),
-                  ${sessionId},
-                  ${userQuery.substring(0, 1000)},
-                  ${text.substring(0, 10000)},
-                  ${mood},
-                  ${ragContext.chunksUsed || 0},
-                  ${ragContext.topScore || 0.0},
-                  ${ragContext.averageScore || 0.0},
-                  NOW()
-                )
-                RETURNING id, "sessionId", timestamp
-              `;
-              
-              console.log('[Analytics] ✅ Successfully logged to Neon!', { 
-                insertedId: insertResult[0]?.id,
-                sessionId: insertResult[0]?.sessionId,
-                timestamp: insertResult[0]?.timestamp,
-                queryLength: userQuery.length, 
-                responseLength: text.length,
-                mood,
-                chunksUsed: ragContext.chunksUsed 
-              });
-            } catch (err) {
-              console.error('[Analytics] ❌ Database error:', err);
-              console.error('[Analytics] ❌ Error details:', {
-                name: err instanceof Error ? err.name : 'Unknown',
-                message: err instanceof Error ? err.message : String(err),
-                stack: err instanceof Error ? err.stack : undefined,
-              });
+            console.log('[Analytics] 🟡 Inside Promise.resolve()...');
+            
+            if (!process.env.DATABASE_URL) {
+              console.error('[Analytics] ❌ DATABASE_URL not set!');
+              return;
             }
+
+            console.log('[Analytics] 📝 DATABASE_URL is set, creating Neon SQL client...');
+            
+            const sql = neon(process.env.DATABASE_URL);
+            
+            console.log('[Analytics] 🔵 Executing INSERT query...');
+            console.log('[Analytics] 🔵 Data to insert:', {
+              sessionId,
+              userQueryLength: userQuery.length,
+              aiResponseLength: text.length,
+              mood,
+              chunksUsed: ragContext.chunksUsed,
+              topScore: ragContext.topScore,
+              avgScore: ragContext.averageScore,
+            });
+            
+            // Use unquoted column names to match Prisma's PostgreSQL naming
+            const insertResult = await sql`
+              INSERT INTO "ChatLog" (
+                id,
+                "sessionId",
+                "userQuery",
+                "aiResponse",
+                mood,
+                "chunksUsed",
+                "topScore",
+                "avgScore",
+                timestamp
+              ) VALUES (
+                gen_random_uuid(),
+                ${sessionId},
+                ${userQuery.substring(0, 1000)},
+                ${text.substring(0, 10000)},
+                ${mood},
+                ${ragContext.chunksUsed || 0},
+                ${ragContext.topScore || 0.0},
+                ${ragContext.averageScore || 0.0},
+                NOW()
+              )
+              RETURNING id, "sessionId", timestamp
+            `;
+            
+            console.log('[Analytics] ✅ Successfully logged to Neon!', { 
+              insertedId: insertResult[0]?.id,
+              sessionId: insertResult[0]?.sessionId,
+              timestamp: insertResult[0]?.timestamp,
+              queryLength: userQuery.length, 
+              responseLength: text.length,
+              mood,
+              chunksUsed: ragContext.chunksUsed 
+            });
+          }).catch((err) => {
+            // CRITICAL: Catch errors that might be swallowed
+            console.error('[Analytics] ❌❌❌ CAUGHT ERROR IN PROMISE:', err);
+            console.error('[Analytics] ❌ Error name:', err instanceof Error ? err.name : 'Unknown');
+            console.error('[Analytics] ❌ Error message:', err instanceof Error ? err.message : String(err));
+            console.error('[Analytics] ❌ Error stack:', err instanceof Error ? err.stack : 'No stack');
           });
         }
       },
