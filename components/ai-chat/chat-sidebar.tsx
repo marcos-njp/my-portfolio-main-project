@@ -8,14 +8,11 @@ import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { MoodSelector } from "./mood-selector";
 import { SuggestedQuestions } from "./suggested-questions";
-import { CommentInput } from "./comment-input";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  comment?: string;
-  rating?: 'positive' | 'neutral';
 }
 
 interface ChatSidebarProps {
@@ -224,20 +221,17 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     }
   };
 
-  const handleComment = (messageId: string, comment: string, rating: 'positive' | 'neutral') => {
+  const handleComment = (messageId: string, comment: string, rating: 'positive' | 'negative') => {
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.id === messageId ? { ...msg, comment, rating } : msg
+        msg.id === messageId ? { ...msg, rating } : msg
       )
     );
 
-    // AI responds to recruiter feedback naturally
-    let aiResponse = "";
-    if (rating === 'positive') {
-      aiResponse = `Thank you so much! I'm happy I could help you. ${comment.includes('wonderful') || comment.includes('great') ? "I appreciate your kind words!" : ""} What else would you like to know about the portfolio?`;
-    } else {
-      aiResponse = `I appreciate your feedback. I'm sorry if my response wasn't perfect - I'm still under development and my intelligence is limited. I'll do my best to improve! Is there something specific I can clarify or expand on?`;
-    }
+    // Simple 1-sentence response
+    const aiResponse = rating === 'positive' 
+      ? "Thank you for the feedback!" 
+      : "I'm sorry, I'll try to improve my responses.";
     
     setMessages((prev) => [
       ...prev,
@@ -248,7 +242,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       },
     ]);
 
-    console.log('[Comment] Recruiter feedback (NOT recorded in DB):', { messageId, comment, rating });
+    console.log('[Feedback] User rated response:', rating, '(NOT saved to DB)');
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -304,32 +298,8 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className="group">
-                <ChatMessage role={message.role} content={message.content} />
-                {message.role === "assistant" && !message.comment && message.content && (
-                  <CommentInput messageId={message.id} onComment={handleComment} />
-                )}
-                {message.comment && (
-                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs border-l-2 border-green-500">
-                    <span className="text-green-700 dark:text-green-300">💬 {message.comment}</span>
-                  </div>
-                )}
-              </div>
+              <ChatMessage key={message.id} role={message.role} content={message.content} />
             ))}
-
-            {isLoading && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                </div>
-                <div className="max-w-[85%] rounded-lg p-4 bg-muted">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div ref={messagesEndRef} />
           </div>
