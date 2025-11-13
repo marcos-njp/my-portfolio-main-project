@@ -6,6 +6,12 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('[Analytics API] 🔍 Starting request processing...');
+    console.log('[Analytics API] 🔧 Environment check:', {
+      DATABASE_URL: process.env.DATABASE_URL ? 'SET ✅' : 'MISSING ❌',
+      NODE_ENV: process.env.NODE_ENV,
+    });
+    
     const data = await req.json();
     
     console.log('[Analytics API] 📝 Received request:', {
@@ -23,6 +29,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[Analytics API] ❌ Error:', error);
+    console.error('[Analytics API] ❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json({ 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error' 

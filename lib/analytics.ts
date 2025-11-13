@@ -13,7 +13,14 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
+console.log('[Prisma] Initializing client...', {
+  DATABASE_URL: process.env.DATABASE_URL ? 'SET ✅' : 'MISSING ❌',
+  NODE_ENV: process.env.NODE_ENV,
+});
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  log: ['error', 'warn'],
+});
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
