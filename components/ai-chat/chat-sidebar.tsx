@@ -66,6 +66,22 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
   useEffect(() => {
     console.log(`[Mood Change] New mood: ${currentMood}`);
+    
+    // Add immediate confirmation message when mood changes
+    if (messages.length > 0) {
+      const moodMessage = currentMood === 'genz' 
+        ? "🔥 Yo! GenZ mode activated fr fr - responses gonna hit different now, no cap! 💯"
+        : "💼 Professional mode activated - back to interview-ready responses.";
+      
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `mood-switch-${Date.now()}`,
+          role: "assistant",
+          content: moodMessage,
+        }
+      ]);
+    }
   }, [currentMood]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,6 +138,24 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       });
     }, 4000);
     setThinkingTimeout(timeout);
+
+    // Add timeout message after 15 seconds for slow responses
+    let longWaitTimeout: NodeJS.Timeout | null = null;
+    longWaitTimeout = setTimeout(() => {
+      setMessages((prev) => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg.role === "assistant" && lastMsg.content.startsWith("💭 Thinking")) {
+          return [
+            ...prev.slice(0, -1),
+            {
+              ...lastMsg,
+              content: "⏳ Taking a bit longer than expected... My AI model has limited processing power and I'm running on a free tier, so complex queries might take time. Feel free to refresh if this takes too long! 😅",
+            },
+          ];
+        }
+        return prev;
+      });
+    }, 15000);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${currentMood}, sessionId: ${sessionId}`);
 
@@ -192,6 +226,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         clearTimeout(thinkingTimeout);
         setThinkingTimeout(null);
       }
+      if (longWaitTimeout) {
+        clearTimeout(longWaitTimeout);
+      }
       if (thinkingInterval) {
         clearInterval(thinkingInterval);
       }
@@ -232,6 +269,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       if (thinkingTimeout) {
         clearTimeout(thinkingTimeout);
         setThinkingTimeout(null);
+      }
+      if (longWaitTimeout) {
+        clearTimeout(longWaitTimeout);
       }
       if (thinkingInterval) {
         clearInterval(thinkingInterval);

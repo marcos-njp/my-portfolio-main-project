@@ -1,7 +1,6 @@
 import { createGroq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
-import { neon } from '@neondatabase/serverless';
 import { validateQuery, enhanceQuery, isMetaQuery, type ValidationResult } from '@/lib/query-validator';
 import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
 import { findRelevantFAQs } from '@/lib/interviewer-faqs';
