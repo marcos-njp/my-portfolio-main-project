@@ -31,7 +31,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm Niño's AI digital twin, powered by advanced RAG technology. Ask me about his technical skills, projects, education, achievements, or career goals. I'm trained on 50+ common interview questions!",
+      content: "Hi! I'm an AI assistant here to help answer your questions about this portfolio. Feel free to ask about technical skills, projects, education, or work experience.",
     },
   ]);
   const [input, setInput] = useState("");

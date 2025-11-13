@@ -288,6 +288,35 @@ export async function POST(req: Request) {
       includeMetadata: true,
     });
 
+    // ========== STEP 4.5: Graceful Fallback for Low RAG Scores ==========
+    const hasGoodContext = ragContext.chunksUsed > 0 && ragContext.topScore >= 0.5;
+    const hasFAQContext = faqContext.length > 0;
+    
+    // If we have neither good RAG nor FAQ context, provide a helpful fallback
+    if (!hasGoodContext && !hasFAQContext && !isShortFollowUp && !isFollowUpResponse) {
+      console.log(`[Graceful Fallback] Low RAG score (${ragContext.topScore.toFixed(2)}) for: "${cleanQuery}"`);
+      
+      // Suggest related topics based on query category
+      const fallbackSuggestions = validation.category === 'projects' 
+        ? "summarize the most impressive projects"
+        : validation.category === 'skills'
+        ? "list the main technical skills and expertise areas"
+        : validation.category === 'experience'
+        ? "describe the work experience and roles"
+        : "tell me about the educational background or career highlights";
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'insufficient_context',
+          message: `Sorry, I couldn't find specific information about that. Would you like me to ${fallbackSuggestions}?`
+        }),
+        {
+          status: 200, // Use 200 to avoid breaking the UI
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     // Build context prompt
     let contextInfo = '';
     
