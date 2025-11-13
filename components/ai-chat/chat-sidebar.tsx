@@ -38,6 +38,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [thinkingTimeout, setThinkingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [thinkingInterval, setThinkingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [currentMood, setCurrentMood] = useState<AIMood>("professional");
   
   const [sessionId] = useState(() => {
@@ -66,6 +67,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
   useEffect(() => {
     console.log(`[Mood Change] New mood: ${currentMood}`);
+    
+    // Clear conversation when mood switches so new mood applies immediately
+    if (messages.length > 1) {
+      setMessages([{
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "Hey! I'm Niño's AI digital twin. Ask me about his projects, skills, or experience!",
+      }]);
+    }
   }, [currentMood]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,41 +115,47 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     setInput("");
     setIsLoading(true);
 
-    // Add thinking message after 4 seconds
-    const timeout = setTimeout(() => {
+    // Create abort controller for request termination
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    // Progressive timeout stages
+    const stage1Timeout = setTimeout(() => {
       setMessages((prev) => {
-        const lastMsg = prev[prev.length - 1];
-        if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content === '') {
-          return [
-            ...prev.slice(0, -1),
-            {
-              ...lastMsg,
-              content: '🤔 Let me formulate a comprehensive response for you...'
-            }
-          ];
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage.role === 'assistant' && lastMessage.content.startsWith('💭')) {
+          lastMessage.content = '🕒 Hold on, processing your request...';
         }
-        return prev;
+        return newMessages;
       });
     }, 4000);
-    setThinkingTimeout(timeout);
 
-    // Add timeout message after 15 seconds for slow responses
-    let longWaitTimeout: NodeJS.Timeout | null = null;
-    longWaitTimeout = setTimeout(() => {
+    const stage2Timeout = setTimeout(() => {
       setMessages((prev) => {
-        const lastMsg = prev[prev.length - 1];
-        if (lastMsg.role === "assistant" && lastMsg.content.startsWith("💭 Thinking")) {
-          return [
-            ...prev.slice(0, -1),
-            {
-              ...lastMsg,
-              content: "⏳ Taking a bit longer than expected... My AI model has limited processing power and I'm running on a free tier, so complex queries might take time. Feel free to refresh if this takes too long! 😅",
-            },
-          ];
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage.role === 'assistant' && lastMessage.content.includes('processing')) {
+          lastMessage.content = '⏳ Getting there, almost done...';
         }
-        return prev;
+        return newMessages;
       });
-    }, 15000);
+    }, 8000);
+
+    const abortTimeout = setTimeout(() => {
+      controller.abort();
+      clearInterval(thinkingInterval);
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "❌ Request timed out after 12 seconds. My AI model couldn't process this in time. Please try asking in a simpler way or refresh and try again.",
+        },
+      ]);
+      setIsLoading(false);
+      setAbortController(null);
+    }, 12000);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${currentMood}, sessionId: ${sessionId}`);
 
@@ -159,7 +175,14 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
+        signal: controller.signal,
       });
+
+      // Clear all timeouts on successful response
+      clearTimeout(stage1Timeout);
+      clearTimeout(stage2Timeout);
+      clearTimeout(abortTimeout);
+      clearInterval(thinkingInterval);
 
       if (response.status === 400) {
         const errorData = await response.json();
@@ -205,18 +228,6 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       const decoder = new TextDecoder();
       let aiResponse = "";
 
-      // Clear thinking timeout and animation
-      if (thinkingTimeout) {
-        clearTimeout(thinkingTimeout);
-        setThinkingTimeout(null);
-      }
-      if (longWaitTimeout) {
-        clearTimeout(longWaitTimeout);
-      }
-      if (thinkingInterval) {
-        clearInterval(thinkingInterval);
-      }
-
       // Update the existing "Thinking..." message instead of adding a new one
       let streamedContent = "";
 
@@ -239,27 +250,24 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
       console.log('[API Call] ✅ Full response:', streamedContent);
       
-      // Clear any remaining timeout
-      if (thinkingTimeout) {
-        clearTimeout(thinkingTimeout);
-        setThinkingTimeout(null);
-      }
-      
       setIsLoading(false);
+      setAbortController(null);
     } catch (error) {
       console.error("[API Error]", error);
       
-      // Clear timeout and animation on error
+      // Clear all timeouts and intervals on error
       if (thinkingTimeout) {
         clearTimeout(thinkingTimeout);
         setThinkingTimeout(null);
-      }
-      if (longWaitTimeout) {
-        clearTimeout(longWaitTimeout);
       }
       if (thinkingInterval) {
         clearInterval(thinkingInterval);
         setThinkingInterval(null);
+      }
+      
+      // Don't show error if request was aborted (timeout)
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
       }
       
       setMessages((prev) => [
