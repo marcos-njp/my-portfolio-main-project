@@ -283,8 +283,8 @@ export async function POST(req: Request) {
 
     // ========== STEP 4: Vector Search with Enhanced RAG ==========
     const ragContext = await searchVectorContext(vectorIndex, enhancedQuery, {
-      topK: 5,
-      minScore: 0.75, // Balanced threshold for good coverage
+      topK: 4, // Reduced from 5 for faster search
+      minScore: 0.7, // Slightly reduced for faster results
       includeMetadata: true,
     });
 
@@ -385,7 +385,11 @@ export async function POST(req: Request) {
           // Log analytics asynchronously (completely non-blocking)
           Promise.resolve().then(async () => {
             try {
-              await fetch('/api/analytics/log', {
+              const analyticsUrl = process.env.NODE_ENV === 'production' 
+                ? '/api/analytics/log' 
+                : 'http://localhost:3000/api/analytics/log';
+              
+              const response = await fetch(analyticsUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -398,8 +402,14 @@ export async function POST(req: Request) {
                   avgScore: ragContext.averageScore,
                 }),
               });
+              
+              if (response.ok) {
+                console.log('[Analytics] ✅ Logged successfully');
+              } else {
+                console.error('[Analytics] ❌ Failed with status:', response.status);
+              }
             } catch (err) {
-              console.error('[Analytics] Failed (non-blocking):', err);
+              console.error('[Analytics] ❌ Network error:', err);
             }
           });
         }

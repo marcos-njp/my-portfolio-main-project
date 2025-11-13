@@ -8,11 +8,14 @@ import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { MoodSelector } from "./mood-selector";
 import { SuggestedQuestions } from "./suggested-questions";
+import { CommentInput } from "./comment-input";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  comment?: string;
+  rating?: 'positive' | 'neutral';
 }
 
 interface ChatSidebarProps {
@@ -36,6 +39,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [thinkingTimeout, setThinkingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [currentMood, setCurrentMood] = useState<AIMood>("professional");
   
   const [sessionId] = useState(() => {
@@ -79,6 +83,24 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+
+    // Add thinking message after 4 seconds
+    const timeout = setTimeout(() => {
+      setMessages((prev) => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content === '') {
+          return [
+            ...prev.slice(0, -1),
+            {
+              ...lastMsg,
+              content: '🤔 Let me formulate a comprehensive response for you...'
+            }
+          ];
+        }
+        return prev;
+      });
+    }, 4000);
+    setThinkingTimeout(timeout);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${currentMood}, sessionId: ${sessionId}`);
 
@@ -142,6 +164,12 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       const decoder = new TextDecoder();
       let aiResponse = "";
 
+      // Clear thinking timeout
+      if (thinkingTimeout) {
+        clearTimeout(thinkingTimeout);
+        setThinkingTimeout(null);
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -167,9 +195,23 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       }
 
       console.log('[API Call] ✅ Full response:', aiResponse);
+      
+      // Clear any remaining timeout
+      if (thinkingTimeout) {
+        clearTimeout(thinkingTimeout);
+        setThinkingTimeout(null);
+      }
+      
       setIsLoading(false);
     } catch (error) {
       console.error("[API Error]", error);
+      
+      // Clear timeout on error
+      if (thinkingTimeout) {
+        clearTimeout(thinkingTimeout);
+        setThinkingTimeout(null);
+      }
+      
       setMessages((prev) => [
         ...prev.slice(0, -1),
         {
@@ -180,6 +222,26 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       ]);
       setIsLoading(false);
     }
+  const handleComment = (messageId: string, comment: string, rating: 'positive' | 'neutral') => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, comment, rating } : msg
+      )
+    );
+
+    // Send comment as follow-up context to AI
+    const aiResponse = `Thank you for the feedback! ${comment} I'm glad that was helpful. What else would you like to know?`;
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: aiResponse,
+      },
+    ]);
+
+    console.log('[Comment] Recruiter feedback:', { messageId, comment, rating });
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -189,6 +251,8 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       if (form) {
         form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
       }
+    }, 100);
+  };  }
     }, 100);
   };
 
@@ -211,10 +275,20 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold">AI Digital Twin</h2>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((message) => (
+              <div key={message.id} className="group">
+                <ChatMessage role={message.role} content={message.content} />
+                {message.role === "assistant" && !message.comment && message.content && (
+                  <CommentInput messageId={message.id} onComment={handleComment} />
+                )}
+                {message.comment && (
+                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs border-l-2 border-green-500">
+                    <span className="text-green-700 dark:text-green-300">💬 {message.comment}</span>
+                  </div>
+                )}
+              </div>
+            ))}   <h2 className="text-base font-semibold">AI Digital Twin</h2>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                     Online • Powered by Groq AI
