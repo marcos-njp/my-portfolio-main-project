@@ -86,14 +86,13 @@ export async function loadConversationHistory(
   sessionId: string
 ): Promise<SessionMessage[]> {
   try {
-    const data = await redis.get<string>(`chat_session:${sessionId}`);
+    const sessionData = await redis.get<SessionData>(`chat_session:${sessionId}`);
     
-    if (!data) {
+    if (!sessionData) {
       console.log(`[Session Memory] No history found for session ${sessionId}`);
       return [];
     }
 
-    const sessionData = JSON.parse(data) as SessionData;
     console.log(`[Session Memory] Loaded ${sessionData.messages.length} messages for session ${sessionId}`);
     
     return sessionData.messages;
@@ -110,11 +109,10 @@ export async function loadFeedbackPreferences(
   sessionId: string
 ): Promise<FeedbackPreferences | null> {
   try {
-    const data = await redis.get<string>(`chat_session:${sessionId}`);
+    const sessionData = await redis.get<SessionData>(`chat_session:${sessionId}`);
     
-    if (!data) return null;
+    if (!sessionData) return null;
 
-    const sessionData = JSON.parse(data) as SessionData;
     return sessionData.feedbackPreferences || null;
   } catch (error) {
     console.error('[Adaptive Feedback] Failed to load preferences:', error);
@@ -139,11 +137,10 @@ export async function clearSessionHistory(sessionId: string): Promise<void> {
  */
 export async function getSessionMood(sessionId: string): Promise<string> {
   try {
-    const data = await redis.get<string>(`chat_session:${sessionId}`);
+    const sessionData = await redis.get<SessionData>(`chat_session:${sessionId}`);
     
-    if (!data) return 'professional';
+    if (!sessionData) return 'professional';
 
-    const sessionData = JSON.parse(data) as SessionData;
     return sessionData.mood || 'professional';
   } catch (error) {
     console.error('[Session Memory] Failed to get mood:', error);
