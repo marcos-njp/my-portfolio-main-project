@@ -11,6 +11,7 @@ import ExperienceSection from "@/components/sections/experience-section"
 import EducationSection from "@/components/sections/education-section"
 import ChatSidebar from "@/components/ai-chat/chat-sidebar"
 import ChatTrigger from "@/components/ai-chat/chat-trigger"
+import { Bot, MessageCircle, Sparkles, Briefcase, Wrench, Trophy } from "lucide-react"
 
 export default function Page() {
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -86,18 +87,18 @@ export default function Page() {
                     AI Digital Twin Assistant
                   </h2>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                    My AI digital twin powered by RAG (Retrieval-Augmented Generation) can answer questions about my skills, projects, and experience in real-time. Try asking about my robotics competition achievements or recent projects!
+                    An AI assistant that can help answer questions about my background, skills, and projects. It uses RAG (Retrieval-Augmented Generation) to provide relevant information from my portfolio data.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <div className="flex -space-x-2">
                       <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center">
-                        <span className="text-xs">🤖</span>
+                        <Bot className="w-3 h-3 text-primary" />
                       </div>
                       <div className="w-6 h-6 rounded-full bg-accent/20 border-2 border-background flex items-center justify-center">
-                        <span className="text-xs">💬</span>
+                        <MessageCircle className="w-3 h-3 text-accent-foreground" />
                       </div>
                       <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center">
-                        <span className="text-xs">✨</span>
+                        <Sparkles className="w-3 h-3 text-primary" />
                       </div>
                     </div>
                     <span>Powered by Groq AI (llama-3.1-8b-instant) • Upstash Vector Database • Click to start chatting!</span>
@@ -112,7 +113,8 @@ export default function Page() {
                         setIsChatOpen(true);
                       }}
                     >
-                      💼 Ask about experience
+                      <Briefcase className="w-3 h-3" />
+                      Ask about experience
                     </button>
                     <button 
                       className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
@@ -121,7 +123,8 @@ export default function Page() {
                         setIsChatOpen(true);
                       }}
                     >
-                      🛠️ Technical skills
+                      <Wrench className="w-3 h-3" />
+                      Technical skills
                     </button>
                     <button 
                       className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
@@ -130,7 +133,8 @@ export default function Page() {
                         setIsChatOpen(true);
                       }}
                     >
-                      🏆 Competition achievements
+                      <Trophy className="w-3 h-3" />
+                      Competition achievements
                     </button>
                   </div>
                 </div>

@@ -31,7 +31,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hey! Ask me anything about my skills, projects, or experience.",
+      content: "Hey, I am Niño's Digital Twin! Ask me anything about my skills, projects, or experience.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -74,6 +74,10 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+
+    // Capture the current mood at submission time to ensure it's the latest
+    const submissionMood = currentMood;
+    console.log(`[Mood Debug] Mood at submission: ${submissionMood}`);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -150,14 +154,14 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       setAbortController(null);
     }, 12000);
 
-    console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${currentMood}, sessionId: ${sessionId}`);
+    console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${submissionMood}, sessionId: ${sessionId}`);
 
     const requestBody = {
       messages: [...messages, userMessage].map((m) => ({
         role: m.role,
         content: m.content,
       })),
-      mood: currentMood,
+      mood: submissionMood,
       sessionId: sessionId,
     };
     

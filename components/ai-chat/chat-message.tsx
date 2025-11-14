@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, User, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
@@ -35,8 +35,7 @@ export function ChatMessage({ role, content, isStreaming = false, error }: ChatM
       >
         <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
           error ? "text-destructive" : ""
-        } ${isThinking ? "flex items-center gap-2" : ""}`}>
-          {isThinking && <Loader2 className="w-4 h-4 animate-spin inline" />}
+        }`}>
           {content}
         </p>
         
@@ -58,11 +57,6 @@ export function ChatMessage({ role, content, isStreaming = false, error }: ChatM
         )}
       </div>
 
-      {role === "user" && (
-        <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-          <User className="w-4 h-4 text-primary-foreground" />
-        </div>
-      )}
     </div>
   );
 }
