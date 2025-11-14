@@ -4,6 +4,11 @@ import { z } from "zod";
 import { chatTool } from "@/lib/chat-mcp";
 import { resolveApiDomain } from "@/lib/url-resolver";
 
+// Vercel Edge Runtime config for SSE support
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
 // Define schema inline without chained optional/default
 const chatParamsShape = {
   message: z.string().min(1).max(1000),

@@ -364,6 +364,7 @@ pnpm add @neondatabase/serverless
 # Create a script or API endpoint that calls initializeDatabaseTables()
 ```
 
+
 ## Database Initialization
 
 Option 1: Run SQL directly in Neon console
