@@ -3,7 +3,7 @@ import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
 import { validateQuery, enhanceQuery, isMetaQuery, type ValidationResult } from '@/lib/query-validator';
 import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
-import { findRelevantFAQs } from '@/lib/interviewer-faqs';
+import { findRelevantFAQPatterns } from '@/lib/interviewer-faqs';
 import { preprocessQuery } from '@/lib/query-preprocessor';
 import { getResponseLengthInstruction } from '@/lib/response-manager';
 import { getMoodConfig, type AIMood } from '@/lib/ai-moods';
@@ -183,15 +183,15 @@ export async function POST(req: Request) {
       console.log(`[Follow-Up] Detected follow-up response: "${cleanQuery}" - skipping validation, using context`);
     }
 
-    // ========== STEP 2: Check FAQ Database First ==========
-    const relevantFAQs = findRelevantFAQs(cleanQuery, 2);
-    let faqContext = '';
+    // ========== STEP 2: Check FAQ Patterns for Context Hints ==========
+    const relevantPatterns = findRelevantFAQPatterns(cleanQuery, 2);
+    let contextHints = '';
     
-    if (relevantFAQs.length > 0) {
-      faqContext = '\n\nFREQUENTLY ASKED (High Priority):\n' + 
-        relevantFAQs.map((faq, idx) => 
-          `${idx + 1}. Q: ${faq.question}\nA: ${faq.response}`
-        ).join('\n\n');
+    if (relevantPatterns.length > 0) {
+      contextHints = '\n\nCONTEXT FOCUS AREAS:\n' + 
+        relevantPatterns.map((pattern, idx) => 
+          `${idx + 1}. ${pattern.contextHint} (Category: ${pattern.category})`
+        ).join('\n');
     }
 
     // ========== STEP 3: Enhance Query for Better Vector Search ==========
@@ -205,11 +205,10 @@ export async function POST(req: Request) {
     });
 
     // ========== STEP 4.5: Graceful Fallback for Very Low RAG Scores ==========
-    // const hasGoodContext = ragContext.chunksUsed > 0 && ragContext.topScore >= 0.3;
-    const hasFAQContext = faqContext.length > 0;
+    const hasContextHints = contextHints.length > 0;
     
     // Only trigger fallback for very poor context (topScore < 0.2) AND no chunks
-    if (ragContext.chunksUsed === 0 && ragContext.topScore < 0.2 && !hasFAQContext && !isShortFollowUp && !isFollowUpResponse) {
+    if (ragContext.chunksUsed === 0 && ragContext.topScore < 0.2 && !hasContextHints && !isShortFollowUp && !isFollowUpResponse) {
       console.log(`[Graceful Fallback] Low RAG score (${ragContext.topScore.toFixed(2)}) for: "${cleanQuery}"`);
       
       // Suggest related topics based on query category
@@ -236,17 +235,19 @@ export async function POST(req: Request) {
     // Build context prompt
     let contextInfo = '';
     
-    // Always include FAQ context if available (it's pre-optimized)
-    if (faqContext) {
-      contextInfo += '\n\n' + faqContext;
+    // Include context hints if available (guides AI focus areas)
+    if (contextHints) {
+      contextInfo += '\n\n' + contextHints;
     }
     
     // Add vector search context if we have good results
     if (ragContext.chunksUsed > 0) {
       contextInfo += buildContextPrompt(ragContext);
     } else {
-      // If no vector context found, add note to use core identity
-      contextInfo += '\n\nNOTE: No specific vector context found. Use CORE IDENTITY information to provide a helpful answer.';
+      // If no vector context found, use hints or default to core identity
+      if (!contextHints) {
+        contextInfo += '\n\nNOTE: No specific vector context found. Use available conversation context and general knowledge to provide a helpful answer about Niño Marcos.';
+      }
     }
 
     // Log relevance metrics for monitoring
