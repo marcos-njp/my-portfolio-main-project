@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { type AIMood } from "@/lib/ai-moods";
-import { X, Sparkles, Loader2 } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { MoodSelector } from "./mood-selector";
@@ -36,9 +36,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [thinkingTimeout, setThinkingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [thinkingInterval, setThinkingInterval] = useState<NodeJS.Timeout | null>(null);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [_thinkingTimeout, _setThinkingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [_thinkingInterval, _setThinkingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [_abortController, setAbortController] = useState<AbortController | null>(null);
   const [currentMood, setCurrentMood] = useState<AIMood>("professional");
   
   const [sessionId] = useState(() => {
@@ -241,7 +241,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       }
       
       const decoder = new TextDecoder();
-      let aiResponse = "";
+      const aiResponse = "";
 
       // Update the existing "Thinking..." message instead of adding a new one
       let streamedContent = "";
@@ -295,15 +295,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     }
   };
 
-  const handleComment = (messageId: string, comment: string, rating: 'positive' | 'negative') => {
+  const _handleComment = (_messageId: string, _comment: string, _rating: 'positive' | 'negative') => {
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.id === messageId ? { ...msg, rating } : msg
+        msg.id === _messageId ? { ...msg, rating: _rating } : msg
       )
     );
 
     // Simple 1-sentence response
-    const aiResponse = rating === 'positive' 
+    const aiResponse = _rating === 'positive' 
       ? "Thank you for the feedback!" 
       : "I'm sorry, I'll try to improve my responses.";
     
@@ -316,7 +316,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       },
     ]);
 
-    console.log('[Feedback] User rated response:', rating, '(NOT saved to DB)');
+    console.log('[Feedback] User rated response:', _rating, '(NOT saved to DB)');
   };
 
   const handleSuggestionClick = (suggestion: string) => {
