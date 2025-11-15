@@ -5,6 +5,10 @@
     "location": "Tuguegarao City, Philippines",
     "summary": "3rd-year IT student at St. Paul University Philippines actively building production web applications. International robotics competitor (4th/118 teams, STEAM Challenge 2018) with hands-on experience in Next.js, TypeScript, and AI integration. Self-taught modern web stack with 3+ deployed applications and practical experience in OAuth, RAG systems, and database management.",
     "elevator_pitch": "I'm Nino - I competed internationally in robotics at 13 and have been passionate about building ever since. I've deployed 3 production applications, integrated AI systems, and taught myself modern web development. I enjoy problem-solving, self-directed learning, and have a genuine passion for technology. I'm looking for a team where I can contribute while learning from experienced developers.",
+    "documentation": {
+      "portfolio_docs": "https://my-portfolio-marcos-njp.vercel.app/docs",
+      "description": "Comprehensive documentation covering RAG architecture, MCP integration, GitHub operations, profile data structure, advanced features, testing procedures, and troubleshooting guides for the AI-powered portfolio system"
+    },
     "contact": {
       "email": "justinpmarcos@gmail.com",
       "linkedin": "https://www.linkedin.com/in/nino-marcos/",
@@ -87,12 +91,13 @@
       "duration": "November 2018",
       "company_context": "International robotics competition with 118 teams from 5 countries",
       "team_structure": "Team member representing Philippines",
+      "proof_link": "https://www.facebook.com/StPaulUniversityPhilippines/posts/caritas-christi-urget-nos-spup-beu-robotics-team-clinches-international-awards-b/1909122265809145/",
       "achievements_star": [
         {
           "situation": "Selected to represent Team Philippines in international robotics competition in Shenzhen, China",
           "task": "Compete in Programming Skills Excellence category against 118 international teams",
           "action": "Developed and optimized Python programming solutions for VEX IQ robotics challenges, collaborated with team members, debugged code under time pressure",
-          "result": "Achieved 4th place finish in Programming Skills Excellence category, demonstrating strong problem-solving and coding skills on international stage"
+          "result": "Achieved 4th place finish in Programming Skills Excellence category, demonstrating strong problem-solving and coding skills on international stage. Official announcement available at: https://www.facebook.com/StPaulUniversityPhilippines/posts/1909122265809145/"
         }
       ],
       "technical_skills_used": [
@@ -112,12 +117,13 @@
       "duration": "October 2018",
       "company_context": "National robotics competition with 43 participating schools",
       "team_structure": "Team member representing St. Paul University Philippines",
+      "proof_link": "https://www.facebook.com/StPaulUniversityPhilippines/posts/caritas-christi-urget-nos-spup-beu-secures-victory-in-robothon-national-competit/1867646416623397/",
       "achievements_star": [
         {
           "situation": "Selected to represent school in prestigious national robotics competition",
           "task": "Compete in robotics programming challenges against 43 schools nationwide",
           "action": "Applied Python programming skills to robotics challenges, worked collaboratively with team, implemented efficient algorithms for robot control",
-          "result": "Earned 5th place and Excellence Award, demonstrating technical competence and competitive programming abilities"
+          "result": "Earned 5th place and Excellence Award, demonstrating technical competence and competitive programming abilities. Official announcement available at: https://www.facebook.com/StPaulUniversityPhilippines/posts/1867646416623397/"
         }
       ],
       "technical_skills_used": [
@@ -453,14 +459,15 @@
       "id": "chunk_1",
       "title": "Personal Profile",
       "type": "personal_info",
-      "content": "Name: Ni├▒o Marcos. Title: IT Student & Full Stack Developer. Location: Tuguegarao City, Philippines. Summary: 3rd-year IT student at St. Paul University Philippines actively building production web applications. International robotics competitor (4th/118 teams, STEAM Challenge 2018) with hands-on experience in Next.js, TypeScript, and AI integration. Self-taught modern web stack with 3+ deployed applications and practical experience in OAuth, RAG systems, and database management. Elevator Pitch: I'm Ni├▒o - I competed internationally in robotics at 13 and have been passionate about building ever since. I've deployed 3 production applications, integrated AI systems, and taught myself modern web development. I enjoy problem-solving, self-directed learning, and have a genuine passion for technology. I'm looking for a team where I can contribute while learning from experienced developers. Fun Facts: Started programming at 8 years old with Scratch, moved to Python by 10. Represented Philippines internationally at 13 - youngest team member. Built my first web app before taking any formal web dev courses. Actually enjoy debugging - it's like solving puzzles under pressure. Can switch between professional recruiter mode and GenZ slang mode ≡ƒöÑ",
+      "content": "Name: Niño Marcos. Title: IT Student & Full Stack Developer. Location: Tuguegarao City, Philippines. Summary: 3rd-year IT student at St. Paul University Philippines actively building production web applications. International robotics competitor (4th/118 teams, STEAM Challenge 2018) with hands-on experience in Next.js, TypeScript, and AI integration. Self-taught modern web stack with 3+ deployed applications and practical experience in OAuth, RAG systems, and database management. Elevator Pitch: I'm Niño - I competed internationally in robotics at 13 and have been passionate about building ever since. I've deployed 3 production applications, integrated AI systems, and taught myself modern web development. I enjoy problem-solving, self-directed learning, and have a genuine passion for technology. I'm looking for a team where I can contribute while learning from experienced developers. Documentation: Comprehensive technical documentation available at https://my-portfolio-marcos-njp.vercel.app/docs covering RAG architecture, MCP integration, GitHub operations, and advanced features. Fun Facts: Started programming at 8 years old with Scratch, moved to Python by 10. Represented Philippines internationally at 13 - youngest team member. Built my first web app before taking any formal web dev courses. Actually enjoy debugging - it's like solving puzzles under pressure. Can switch between professional recruiter mode and GenZ slang mode 😎",
       "metadata": {
         "category": "personal",
         "tags": [
           "profile",
           "introduction",
           "summary",
-          "fun_facts"
+          "fun_facts",
+          "documentation"
         ]
       }
     },
@@ -580,8 +587,10 @@
           "star",
           "accomplishment",
           "results",
-          "impact"
-        ]
+          "impact",
+          "proof_available"
+        ],
+        "proof_link": "https://www.facebook.com/StPaulUniversityPhilippines/posts/1909122265809145/"
       }
     },
     {
@@ -610,8 +619,10 @@
           "star",
           "accomplishment",
           "results",
-          "impact"
-        ]
+          "impact",
+          "proof_available"
+        ],
+        "proof_link": "https://www.facebook.com/StPaulUniversityPhilippines/posts/1867646416623397/"
       }
     },
     {

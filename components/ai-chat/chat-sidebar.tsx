@@ -331,12 +331,13 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
 
   return (
     <>
-      <div
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={onClose}
-      />
+      {/* Semi-transparent overlay - keeps portfolio visible */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-background/20 z-40 transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
 
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-[440px] bg-background border-l shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
@@ -344,17 +345,17 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="border-b p-4 space-y-3">
+          <div className="border-b p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-primary" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h2 className="text-base font-semibold">AI Digital Twin</h2>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Online • Powered by Groq AI
+                    Online
                   </p>
                 </div>
               </div>
@@ -362,12 +363,6 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-
-            <MoodSelector currentMood={currentMood} onMoodChange={setCurrentMood} />
-
-            {messages.length === 1 && (
-              <SuggestedQuestions suggestions={SUGGESTIONS} onSelect={handleSuggestionClick} />
-            )}
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -378,13 +373,40 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          <ChatInput
-            value={input}
-            onChange={setInput}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            mood={currentMood}
-          />
+          <div className="border-t">
+            {/* Suggested Questions */}
+            {messages.length === 0 && (
+              <div className="px-3 py-2 border-b bg-muted/20">
+                <SuggestedQuestions
+                  suggestions={[
+                    "What are your main projects?",
+                    "Tell me about your tech stack",
+                    "What's your experience?",
+                  ]}
+                  onSelect={(question) => {
+                    setInput(question);
+                  }}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+            
+            {/* Mood Selector + Input */}
+            <div className="px-3 py-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Personality:</span>
+                <MoodSelector currentMood={currentMood} onMoodChange={setCurrentMood} />
+              </div>
+              
+              <ChatInput
+                value={input}
+                onChange={setInput}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+                mood={currentMood}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'v1.screenshot.11ty.dev',
       },
+      {
+        protocol: 'https',
+        hostname: 'spup.edu.ph',
+      },
     ],
   },
   experimental: {

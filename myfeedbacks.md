@@ -1,18 +1,15 @@
-I have some minor changes
-- remove the labels like week 6 in docs.
-- didn't I use both redis and vector? please verify
-- remove the colored cards and choose a better approach? mcp-integration area
-- progressive loading states does not reflect what the range of seconds are based on what we have.
-- we implemented standrd 0.6 minimum 0.7 ideal right? please veirfy
-- opreations and trouble shooting, the mcp connectivity issues did not reflect how we solved it. I think what we did was we deployed it to vercel and tried to use it automatically to claude wihtout changing the localhost:3000 to the mcp vercel url.
-- token requests are still 1k to 2.5k but it generated better respnses as before that does 1.5k to 3k
-- movie discovery app has no live demo btw.
-- star methodology colors are kinda off to me idk how to explain it.
+- make the ai chat section the same with the overall theme of my portfolio.
+- put the features (i) at the bottom,
+- put hte try asking at the bootom as well
+- add the personality button at the bottom of the ai chat side bar as well
+- remove the thumbs up and thumbs down icon since it is not being utilized by anything, its just thjere. unless you make a use of it that will help my ai
+-
 
-
-- improve ux because I do not know which tab I am viewing.
-
-
-- you failed to implement global changes to the documentation. You only edited a specific part of it. and data on others remains the same
-- the feedback mechanism that I was talking about is when the user prompts "That's a good response" and the AI will recognize that as feedback.
-- in the progressive loading stages, the small subscripts at the button, you made it look like the ai takes 12 seconds to generate. I siad, we implemented those fallback or graceful fallbacks so the user will know thinking and will termiante after 12 seconds right? 
+in ai chat section
+- the design feels so out ofplace
+- put a button outside the card and label as something like view features
+- put the doucmentation button as well there abnd click, check how I made it/documentaiton. 
+- jus tput powered by ollama model, and through upstash vector
+- remove try asking area since it kinda redundant.
+- the actual card is too big
+- when clicked, and the chat side bar appears, I want the portfolio to be still visible instead of getting blurred so that the user can scroll through my protfolio while waiting for a response.

@@ -214,12 +214,15 @@ export async function POST(req: Request) {
       includeMetadata: true,
     });
 
-    // ========== STEP 4.5: Graceful Fallback for Very Low RAG Scores ==========
+    // ========== STEP 4.5: STRICT Validation - Prevent Fabrication ==========
     const hasContextHints = contextHints.length > 0;
     
-    // Only trigger fallback for very poor context (topScore < 0.2) AND no chunks
-    if (ragContext.chunksUsed === 0 && ragContext.topScore < 0.2 && !hasContextHints && !isShortFollowUp && !isFollowUpResponse) {
-      console.log(`[Graceful Fallback] Low RAG score (${ragContext.topScore.toFixed(2)}) for: "${cleanQuery}"`);
+    // CRITICAL: Require minimum relevance score to prevent making up information
+    // If we have no good context (score < 0.6) AND no chunks, reject the query
+    const hasGoodContext = ragContext.chunksUsed > 0 && ragContext.topScore >= 0.6;
+    
+    if (!hasGoodContext && !hasContextHints && !isShortFollowUp && !isFollowUpResponse) {
+      console.log(`[STRICT VALIDATION] No relevant context found (topScore: ${ragContext.topScore.toFixed(2)}, chunks: ${ragContext.chunksUsed}) for: "${cleanQuery}"`);
       
       // Suggest related topics based on query category
       const fallbackSuggestions = validation.category === 'projects' 
@@ -228,12 +231,18 @@ export async function POST(req: Request) {
         ? "list the main technical skills and expertise areas"
         : validation.category === 'experience'
         ? "describe the work experience and roles"
-        : "tell me about the educational background or career highlights";
+        : validation.category === 'education'
+        ? "tell me about educational background and university"
+        : "tell me about the career highlights and achievements";
+      
+      const rejectionMessage = mood === 'genz'
+        ? `Yo, I don't have that info in my knowledge base fr 😅 But I can ${fallbackSuggestions}! Want me to share that instead? 🔥`
+        : `I don't have specific information about that in my knowledge base. However, I can ${fallbackSuggestions}. Would you like to know about that instead?`;
       
       return new Response(
         JSON.stringify({ 
           error: 'insufficient_context',
-          message: `Sorry, I couldn't find specific information about that. Would you like me to ${fallbackSuggestions}?`
+          message: rejectionMessage
         }),
         {
           status: 200, // Use 200 to avoid breaking the UI
@@ -253,10 +262,11 @@ export async function POST(req: Request) {
     // Add vector search context if we have good results
     if (ragContext.chunksUsed > 0) {
       contextInfo += buildContextPrompt(ragContext);
+      contextInfo += '\n\n⚠️ CRITICAL: Only use information from the CONTEXT above. If the context doesn\'t contain the answer, say "I don\'t have that information in my knowledge base" - DO NOT make up or infer information.';
     } else {
       // If no vector context found, use hints or default to core identity
       if (!contextHints) {
-        contextInfo += '\n\nNOTE: No specific vector context found. Use available conversation context and general knowledge to provide a helpful answer about Niño Marcos.';
+        contextInfo += '\n\n⚠️ WARNING: No specific vector context found. You MUST NOT fabricate information. Only answer if you have relevant context from conversation history.';
       }
     }
 
