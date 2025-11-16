@@ -36,11 +36,16 @@ export default function DocsLayout({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pt-20 md:pt-22">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-22">
         <div className="flex gap-6 lg:gap-8">
           {/* Sidebar */}
           <Suspense fallback={<div className="hidden md:block w-64 flex-shrink-0" />}>
-            <DocsSidebar />
+            <div className="hidden md:block sticky top-16 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] w-64 flex-shrink-0 overflow-y-auto">
+              <DocsSidebar />
+            </div>
+            <div className="md:hidden">
+              <DocsSidebar />
+            </div>
           </Suspense>
 
           {/* Main Content */}
