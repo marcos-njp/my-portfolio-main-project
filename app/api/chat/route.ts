@@ -3,6 +3,10 @@ import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
 import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
 import { preprocessQuery } from '@/lib/query-preprocessor';
+import { validateQuery, enhanceQuery } from '@/lib/query-validator';
+import { findRelevantFAQPatterns, buildContextHints } from '@/lib/interviewer-faqs';
+import { validateMoodCompliance } from '@/lib/response-validator';
+import { getResponseLengthInstruction } from '@/lib/response-manager';
 import { getMoodConfig, getPersonaResponse, type AIMood } from '@/lib/ai-moods';
 import { 
   saveConversationHistory, 
@@ -131,6 +135,35 @@ export async function POST(req: Request) {
       console.log(`[Typo Fix] Original: "${userQuery}" → Corrected: "${cleanQuery}" (${preprocessed.changes.join(', ')})`);
     }
 
+    // ========== STEP 0.1: Check for Follow-Ups (Detect Early) ==========
+    const isShortFollowUp = cleanQuery.length < 15 && sessionHistory.length > 0;
+    const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
+    const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
+
+    // ========== STEP 0.3: Validate Query (Filter Irrelevant/Inappropriate) ==========
+    const validation = validateQuery(cleanQuery);
+    
+    if (!validation.isValid && !isShortFollowUp && !isFollowUpResponse) {
+      console.log(`[Query Validation] Rejected: "${cleanQuery}" - Reason: ${validation.reason}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'invalid_query',
+          message: validation.reason
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+    
+    // Enhance query with professional terms if detected
+    const enhancedQuery = enhanceQuery(cleanQuery);
+    console.log(`[Query Validation] Valid: ${validation.isValid}, Confidence: ${validation.confidence.toFixed(2)}, Category: ${validation.category || 'none'}`);
+    if (enhancedQuery !== cleanQuery) {
+      console.log(`[Query Enhancement] Enhanced: "${cleanQuery}" → "${enhancedQuery}"`);
+    }
+
     // ========== STEP 0.5: Check for Unprofessional Requests ==========
     if (isUnprofessionalRequest(cleanQuery)) {
       console.log(`[Adaptive Feedback] Rejected unprofessional request: "${cleanQuery}"`);
@@ -161,10 +194,14 @@ export async function POST(req: Request) {
       }
     }
 
-    // ========== STEP 1: Check for Follow-Ups (Skip Validation) ==========
-    const isShortFollowUp = cleanQuery.length < 15 && sessionHistory.length > 0;
-    const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
-    const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
+    // ========== STEP 1.5: FAQ Pattern Matching (Boost Interview Questions) ==========
+    const faqMatches = findRelevantFAQPatterns(cleanQuery);
+    let faqContextHints = '';
+    
+    if (faqMatches.length > 0) {
+      faqContextHints = buildContextHints(faqMatches);
+      console.log(`[FAQ Boost] Matched ${faqMatches.length} FAQ patterns - boosting RAG search`);
+    }
 
     // ========== STEP 2: Vector Search with RAG ==========
     const ragContext = await searchVectorContext(vectorIndex, cleanQuery, {
@@ -219,20 +256,27 @@ export async function POST(req: Request) {
       console.log(`[Adaptive Feedback] Applying user preferences to this response`);
     }
     
-    // Build final prompt with mood instructions
+    // ========== STEP 4.5: Add Response Length Instruction (Soft Guidelines) ==========
+    const lengthInstruction = getResponseLengthInstruction(); // Uses default constraints
+    
+    // Build final prompt with mood instructions + FAQ hints + length guidelines
     const finalSystemPrompt = mood === 'genz'
       ? moodConfig.systemPromptAddition + '\n\n' +
         'REMINDER: You are in GenZ mode - use slang, emojis, and casual tone!\n\n' +
         SYSTEM_PROMPT + 
         conversationContext + 
         contextInfo +
+        faqContextHints +
         feedbackInstruction +
+        lengthInstruction +
         '\n\n🔥 FINAL REMINDER: This is GenZ mode - be casual, use slang, add emojis! 💯'
       : moodConfig.systemPromptAddition + '\n\n' + 
         SYSTEM_PROMPT + 
         conversationContext + 
         contextInfo +
-        feedbackInstruction;
+        faqContextHints +
+        feedbackInstruction +
+        lengthInstruction;
     
     console.log(`[System Prompt Preview] First 500 chars: ${finalSystemPrompt.substring(0, 500)}...`);
     console.log(`[System Prompt] Total length: ${finalSystemPrompt.length} chars, Mood: ${mood}`);
@@ -253,6 +297,19 @@ export async function POST(req: Request) {
       onFinish: async ({ text }) => {
         const responseTime = Date.now() - startTime;
         console.log(`[Response] Generated in ${responseTime}ms, ${text.length} chars`);
+        
+        // ========== STEP 5: Validate Response Mood Compliance ==========
+        const moodValidation = validateMoodCompliance(text, mood);
+        
+        if (!moodValidation.compliant) {
+          console.warn(`[Response Validation] ⚠️ Mood compliance issue: ${moodValidation.reason || 'Unknown'}`);
+          console.log(`[Response Validation] Compliance score: ${moodValidation.score}/100 (${mood} mode)`);
+          if (moodValidation.details?.warnings) {
+            console.warn(`[Response Validation] Warnings: ${moodValidation.details.warnings.join(', ')}`);
+          }
+        } else {
+          console.log(`[Response Validation] ✅ ${mood} mode compliance: ${moodValidation.score}/100`);
+        }
         
         // Save conversation history with feedback preferences
         if (sessionId) {
