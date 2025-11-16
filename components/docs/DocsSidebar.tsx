@@ -21,8 +21,8 @@ export function DocsSidebar() {
   const section = searchParams.get("section");
 
   return (
-    <aside className="hidden md:block w-64 flex-shrink-0">
-      <nav className="sticky top-20 space-y-1">
+    <aside className="hidden md:block w-64 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20 overflow-y-auto pr-2">
+      <nav className="space-y-1">
         <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Documentation
         </p>
@@ -46,7 +46,7 @@ export function DocsSidebar() {
             </Link>
           );
         })}
-        
+
         <div className="pt-4 mt-4 border-t">
           <Link
             href="/"
