@@ -12,8 +12,7 @@ export function McpIntegrationSection() {
 
       {/* Overview */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Plug className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           What is MCP?
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -46,8 +45,7 @@ export function McpIntegrationSection() {
 
       {/* Architecture */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Server className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           MCP Server Architecture
         </h2>
         <div className="rounded-lg border p-6">
@@ -111,8 +109,7 @@ export function McpIntegrationSection() {
 
       {/* Tool Definition */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Code className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Tool Definition
         </h2>
         <div className="space-y-4">
@@ -199,8 +196,7 @@ export function McpIntegrationSection() {
 
       {/* Claude Desktop Setup */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Terminal className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Claude Desktop Configuration
         </h2>
         <div className="rounded-lg border p-6 space-y-4">

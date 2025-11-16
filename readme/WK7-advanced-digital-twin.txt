@@ -1,0 +1,42 @@
+WK7 Advanced Digital Twin Documentation (Expanded)
+
+Overview:
+This week, we advanced our Digital Twin MCP system by focusing on optimization, multi-platform integration, and professional content refinement. The project is built with Next.js 15, TypeScript, and leverages Groq AI (llama-3.1-8b-instant), Upstash Vector, and Redis for a robust, scalable RAG (Retrieval-Augmented Generation) architecture. Full code and deployment details are available at: https://github.com/marcos-njp/my-portfolio-main-project
+
+Development and Deployment Process:
+- The MCP server was first developed and tested locally in Visual Studio Code using Next.js at http://localhost:3000. This allowed for rapid iteration and debugging.
+- After local validation, the MCP server was deployed to Vercel for production. The endpoint URL was updated from localhost to the Vercel deployment URL, enabling secure, public access and integration with external AI providers (e.g., Claude).
+- Environment variables for Groq, Upstash, and database connections were managed via Vercel project settings, ensuring secure and consistent configuration across environments.
+
+Key Features and Enhancements:
+1. Double Persona/Mood System:
+   - Users can interact with the digital twin in either "professional" or "genz" mode, providing tailored responses for different audiences and use cases. This is managed via session state and mood selectors in the UI.
+
+2. Enhanced General Question Handling:
+   - The system now delivers more context-aware, accurate answers to a wide range of general queries, leveraging improved prompt engineering and response validation.
+
+3. Interviewer FAQ Guide:
+   - When recruiter-style or interviewer FAQs are detected, the AI provides a structured guide to help users understand and answer these questions effectively. This feature is powered by a custom FAQ detector and guide generator.
+
+4. Improved Vector Chunking:
+   - The chunking strategy for vector embeddings was refined, resulting in higher-quality semantic search and more relevant RAG responses. This directly improves the accuracy and usefulness of retrieved information.
+
+5. Multi-Platform Integration Testing:
+   - The system was tested both locally and on Vercel, ensuring consistent behavior and performance across development and production environments. This included integration with external AI providers and validation of all advanced features.
+
+6. Professional Content Refinement:
+   - Based on simulated recruiter feedback, professional profile data and response templates were refined for clarity, relevance, and impact. The STAR methodology is used throughout the profile data for structured, compelling answers.
+
+Code Structure and Best Practices:
+- The project is organized with clear separation of concerns: UI components, lib utilities, data, and API routes.
+- All code is written in TypeScript for type safety and maintainability.
+- pnpm is used for package management, ensuring fast, reproducible installs.
+- Shadcn UI is used for consistent, modern component styling.
+- Build and start scripts (pnpm run build, pnpm run start) are used to validate production readiness before deployment.
+
+Repository and Further Information:
+- Full source code, documentation, and deployment instructions are available at: https://github.com/marcos-njp/my-portfolio-main-project
+- For environment setup, see the README and agents.md files in the repository.
+- The system is designed for extensibility, with clear documentation and modular code to support future enhancements.
+
+This documentation details the advanced features, optimization strategies, and deployment process for Week 7, demonstrating a production-ready, multi-platform Digital Twin MCP system.

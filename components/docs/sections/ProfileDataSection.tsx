@@ -43,8 +43,7 @@ export function ProfileDataSection() {
 
       {/* AI-Powered Portfolio Example */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Zap className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           AI-Powered Portfolio Development
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -103,8 +102,7 @@ export function ProfileDataSection() {
 
       {/* Person Search Application */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Database className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Person Search System with OAuth
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -145,8 +143,7 @@ export function ProfileDataSection() {
 
       {/* RAG System Optimization */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           RAG System Performance Optimization
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -210,8 +207,7 @@ export function ProfileDataSection() {
 
       {/* MCP Integration */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Target className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Model Context Protocol Integration
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -253,8 +249,7 @@ export function ProfileDataSection() {
 
       {/* Skills Demonstration */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Award className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Skills Demonstrated Across Projects
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -335,7 +330,7 @@ export function ProfileDataSection() {
             <Database className="w-5 h-5" />
             <h3 className="font-semibold">Knowledge Base Source</h3>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-4">
             All STAR methodology examples are embedded as 38 semantic chunks in Upstash Vector database 
             from <code className="text-xs bg-muted px-1 py-0.5 rounded">data/digitaltwin.json</code>. 
             The RAG system retrieves relevant achievements based on query context, enabling natural 

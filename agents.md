@@ -14,13 +14,18 @@ AI SETUP:
 - Upstash Redis for caching (optional)
 
 Documentations you must read:
-set up upstash db: https://upstash.com/docs/vector/sdks/ts/getting-started
-redis: https://upstash.com/docs/redis/overall/getstarted
-for the ai: https://ai-sdk.dev/docs/introduction
-groq ai: https://ai-sdk.dev/providers/ai-sdk-providers/groq
+- Set up Upstash Vector DB: https://upstash.com/docs/vector/sdks/ts/getting-started
+- Upstash Redis: https://upstash.com/docs/redis/overall/getstarted
+- AI SDK: https://sdk.vercel.ai/docs/introduction
+- Groq AI: https://sdk.vercel.ai/providers/ai-sdk-providers/groq
 
-The Task that we are going to accomplish comes from this workshop link (MUST READ:)
-https://aiagents.ausbizconsulting.com.au/digital-twin-workshop
+Additional Resources:
+- Digital Twin Workshop: https://aiagents.ausbizconsulting.com.au/digital-twin-workshop
+- Next.js Documentation: https://nextjs.org/docs
+- Tailwind CSS: https://tailwindcss.com/docs
+- Shadcn UI: https://ui.shadcn.com
+- Prisma ORM: https://www.prisma.io/docs
+- MCP Protocol: https://modelcontextprotocol.io/introduction
  
 My database uses Vector and Redis. I use Groq API, check the specific model. We will first test the MCP server locally, and once finished, deploy it to Vercel. BUt take note, that is a separate task so I am just reminding you.
 

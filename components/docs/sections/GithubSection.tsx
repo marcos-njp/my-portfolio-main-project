@@ -3,7 +3,7 @@ import { Github, ExternalLink, Star, Code, Globe } from "lucide-react";
 export function GithubSection() {
   const projects = [
     {
-      name: "AI-Powered Portfolio",
+      name: "RAG Digital Twin Portfolio",
       description: "Digital twin portfolio with RAG, MCP integration, and intelligent conversation system featuring personality modes, session memory, and semantic search.",
       tech: ["Next.js 15", "TypeScript", "Groq AI", "Upstash Vector", "Upstash Redis", "Vercel AI SDK", "Tailwind CSS"],
       github: "https://github.com/marcos-njp/my-portfolio-main-project",
@@ -18,7 +18,7 @@ export function GithubSection() {
       ]
     },
     {
-      name: "Person Search Application",
+      name: "Person Search with Authentication",
       description: "Full-stack person directory with OAuth authentication, advanced filtering, sorting, and secure data management using PostgreSQL.",
       tech: ["Next.js", "TypeScript", "OAuth 2.0", "PostgreSQL", "Prisma ORM", "NextAuth.js", "Tailwind CSS"],
       github: "https://github.com/marcos-njp/person-search",
@@ -33,11 +33,11 @@ export function GithubSection() {
       ]
     },
     {
-      name: "Modern Portfolio Website",
+      name: "Base Prototype CV",
       description: "Responsive portfolio showcasing projects, skills, and experience with dark mode support and smooth animations.",
       tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vercel"],
-      github: "https://github.com/marcos-njp/modern-portfolio",
-      demo: "https://marcos-portfolio.vercel.app",
+      github: "https://github.com/marcos-njp/my-cv",
+      demo: "https://m-njp-simple.vercel.app/",
       highlights: [
         "Smooth scroll animations with Framer Motion",
         "Dark/light theme toggle",
@@ -51,7 +51,7 @@ export function GithubSection() {
       name: "AI Agent Development Setup",
       description: "Comprehensive development environment setup with MCP server integration, AI tools, and automated workflows for agent development.",
       tech: ["Python", "Node.js", "Docker", "MCP", "Claude AI", "VS Code Extensions"],
-      github: "https://github.com/marcos-njp/ai-agent-setup",
+      github: "https://github.com/marcos-njp/ai-agent-dev-setup-marcosnjp",
       demo: null,
       highlights: [
         "MCP server configuration templates",
@@ -63,18 +63,18 @@ export function GithubSection() {
       ]
     },
     {
-      name: "Movie Discovery App",
-      description: "Interactive movie browsing application with search, filtering, and detailed movie information using TMDB API.",
-      tech: ["React", "JavaScript", "TMDB API", "CSS3", "Local Storage"],
+      name: "Prototype Movie Review",
+      description: "Movie review prototype built with Laravel framework, featuring Blade templating, MySQL database, and Tailwind CSS for styling.",
+      tech: ["Laravel", "PHP", "Blade", "MySQL", "Tailwind CSS"],
       github: "https://github.com/marcos-njp/movie-app",
       demo: null,
       highlights: [
-        "TMDB API integration for real-time data",
-        "Advanced search and filtering",
-        "Movie details with ratings and reviews",
-        "Favorite movies with local storage",
-        "Responsive grid layout",
-        "Infinite scroll pagination"
+        "Laravel Blade templating engine",
+        "MySQL database integration",
+        "Tailwind CSS for responsive design",
+        "MVC architecture pattern",
+        "Server-side rendering",
+        "PHP-based backend logic"
       ]
     }
   ];
@@ -133,33 +133,9 @@ export function GithubSection() {
         <div className="space-y-6">
           {projects.map((project, index) => (
             <div key={index} className="rounded-lg border p-6 hover:border-primary transition-colors">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">{project.name}</h3>
-                  <p className="text-sm text-muted-foreground">{project.description}</p>
-                </div>
-                <div className="flex gap-2">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-md hover:bg-muted transition-colors"
-                    aria-label="View GitHub repository"
-                  >
-                    <Github className="w-5 h-5" />
-                  </a>
-                  {project.demo && (
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-md hover:bg-muted transition-colors"
-                      aria-label="View live demo"
-                    >
-                      <ExternalLink className="w-5 h-5" />
-                    </a>
-                  )}
-                </div>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold mb-2">{project.name}</h3>
+                <p className="text-sm text-muted-foreground">{project.description}</p>
               </div>
 
               {/* Tech Stack */}

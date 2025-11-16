@@ -32,8 +32,7 @@ export function OperationsSection() {
 
       {/* MCP Connectivity */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <AlertCircle className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           MCP Connectivity Issues
         </h2>
         <div className="space-y-4">
@@ -50,9 +49,13 @@ export function OperationsSection() {
               <CodeBlock language="json">{`// claude_desktop_config.json - Updated URL
 {
   "mcpServers": {
-    "my-mcp-server": {
-      "url": "https://m-njp.vercel.app/api/mcp",
-      "transport": "http"
+    "digital-twin-production": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://m-njp.vercel.app/api/mcp"
+      ]
     }
   }
 }`}</CodeBlock>
@@ -82,8 +85,7 @@ const validMoods = ['professional', 'genz'] as const;`}</CodeBlock>
 
       {/* RAG Threshold Issues */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Wrench className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           RAG Performance Tuning
         </h2>
         <TroubleshootCard
@@ -127,8 +129,7 @@ console.log('RAG Search Results:', {
 
       {/* Conversation Context */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Code className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Conversation Context Improvements
         </h2>
         <TroubleshootCard
@@ -176,8 +177,7 @@ AI: "The AI-Powered Portfolio uses Next.js 15, TypeScript,
 
       {/* Token Optimization */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <GitCommit className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Token Usage Optimization
         </h2>
         <div className="space-y-4">
@@ -239,8 +239,7 @@ AI: "The AI-Powered Portfolio uses Next.js 15, TypeScript,
 
       {/* Best Practices */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <CheckCircle className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Best Practices Learned
         </h2>
         <div className="grid md:grid-cols-2 gap-4">

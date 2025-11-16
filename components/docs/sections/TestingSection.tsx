@@ -114,8 +114,7 @@ export function TestingSection() {
 
       {/* Follow-up Understanding */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Follow-up Question Intelligence
         </h2>
         <div className="space-y-4">
@@ -165,8 +164,7 @@ export function TestingSection() {
 
       {/* Feedback Implementation */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Copy className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           User Feedback Mechanisms
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -201,8 +199,7 @@ export function TestingSection() {
 
       {/* Token Optimization */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Zap className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Token Usage Optimization
         </h2>
         <div className="space-y-4">
@@ -297,8 +294,7 @@ export function TestingSection() {
 
       {/* RAG Threshold Tuning */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           RAG Threshold Tuning
         </h2>
         <div className="rounded-lg border p-6 space-y-4">

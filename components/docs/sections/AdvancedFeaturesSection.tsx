@@ -1,4 +1,4 @@
-import { Brain, MessageSquare, Search, Shield, Sparkles, Zap, ThumbsUp, AlertTriangle } from "lucide-react";
+import { Brain, MessageSquare, Search, Shield, Sparkles, Zap, ThumbsUp, AlertTriangle, ExternalLink } from "lucide-react";
 import { MetricCard, FeatureCard, SectionHeader, CodeBlock } from "@/components/docs";
 
 export function AdvancedFeaturesSection() {
@@ -13,8 +13,7 @@ export function AdvancedFeaturesSection() {
 
       {/* Personality Modes */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Brain className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Personality Modes
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -76,8 +75,7 @@ export function AdvancedFeaturesSection() {
 
       {/* Session Memory */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Session Memory & Context
         </h2>
         <div className="space-y-4">
@@ -189,8 +187,7 @@ export function AdvancedFeaturesSection() {
 
       {/* Query Preprocessing */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Search className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Query Preprocessing
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -329,8 +326,7 @@ export function AdvancedFeaturesSection() {
 
       {/* Response Optimization */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Zap className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Response Optimization
         </h2>
         <div className="space-y-4">
@@ -392,6 +388,44 @@ export function AdvancedFeaturesSection() {
               <p className="text-xs text-muted-foreground">Context-aware</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* External Resources */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">External Resources</h2>
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
+          <a
+            href="https://sdk.vercel.ai/docs/introduction"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
+          >
+            <div>
+              <p className="font-semibold flex items-center gap-2">
+                <Brain className="w-4 h-4" />
+                AI SDK Documentation
+              </p>
+              <p className="text-sm text-muted-foreground">Vercel AI SDK for streaming and text generation</p>
+            </div>
+            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+          </a>
+
+          <a
+            href="https://sdk.vercel.ai/providers/ai-sdk-providers/groq"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
+          >
+            <div>
+              <p className="font-semibold flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Groq AI Provider
+              </p>
+              <p className="text-sm text-muted-foreground">Groq integration with AI SDK</p>
+            </div>
+            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+          </a>
         </div>
       </section>
 

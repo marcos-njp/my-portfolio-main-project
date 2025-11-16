@@ -1,4 +1,4 @@
-import { Code2, Database, Zap, GitBranch, Settings, CheckCircle } from "lucide-react";
+import { Code2, Database, Zap, GitBranch, Settings, CheckCircle, ExternalLink } from "lucide-react";
 
 export function RagArchitectureSection() {
   return (
@@ -12,8 +12,7 @@ export function RagArchitectureSection() {
 
       {/* System Overview */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Settings className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           System Overview
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -38,8 +37,7 @@ export function RagArchitectureSection() {
 
       {/* Architecture Flow */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <GitBranch className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Request Flow
         </h2>
         <div className="rounded-lg border p-6">
@@ -108,8 +106,7 @@ export function RagArchitectureSection() {
 
       {/* Vector Database */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Database className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Vector Database Structure
         </h2>
         <div className="space-y-4">
@@ -170,8 +167,7 @@ export function RagArchitectureSection() {
 
       {/* Streaming Implementation */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Zap className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Streaming Responses
         </h2>
         <div className="rounded-lg border p-6 space-y-4">
@@ -203,8 +199,7 @@ export function RagArchitectureSection() {
 
       {/* Performance Metrics */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <Code2 className="w-6 h-6" />
+        <h2 className="text-2xl font-semibold mb-4">
           Performance Optimization
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -223,6 +218,44 @@ export function RagArchitectureSection() {
             <p className="text-2xl font-bold">Redis</p>
             <p className="text-xs text-muted-foreground">Session persistence</p>
           </div>
+        </div>
+      </section>
+
+      {/* External Resources */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">External Resources</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <a
+            href="https://upstash.com/docs/vector/sdks/ts/getting-started"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
+          >
+            <div>
+              <p className="font-semibold flex items-center gap-2">
+                <Database className="w-4 h-4" />
+                Upstash Vector Documentation
+              </p>
+              <p className="text-sm text-muted-foreground">TypeScript SDK setup and usage</p>
+            </div>
+            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+          </a>
+
+          <a
+            href="https://upstash.com/docs/redis/overall/getstarted"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
+          >
+            <div>
+              <p className="font-semibold flex items-center gap-2">
+                <Database className="w-4 h-4" />
+                Upstash Redis Documentation
+              </p>
+              <p className="text-sm text-muted-foreground">Session storage and caching setup</p>
+            </div>
+            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+          </a>
         </div>
       </section>
 

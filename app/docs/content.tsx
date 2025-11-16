@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import Link from "next/link";
 import { Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, ArrowRight } from "lucide-react";
 import {
@@ -61,6 +62,10 @@ const sections = [
 export default function DocsContent() {
   const searchParams = useSearchParams();
   const section = searchParams.get("section");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [section]);
 
   const renderSection = () => {
     switch (section) {
@@ -157,6 +162,27 @@ export default function DocsContent() {
                 <Link href="https://m-njp.vercel.app" className="text-primary hover:underline" target="_blank">
                   Live Demo ↗
                 </Link>
+              </div>
+            </div>
+
+            <div className="rounded-lg border p-6">
+              <h2 className="text-lg font-semibold mb-3">External Resources</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Helpful documentation and tutorials used to build this project:
+              </p>
+              <div className="grid md:grid-cols-2 gap-3 text-sm">
+                <a href="https://nextjs.org/docs" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Next.js Documentation ↗
+                </a>
+                <a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Tailwind CSS Docs ↗
+                </a>
+                <a href="https://ui.shadcn.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Shadcn UI Components ↗
+                </a>
+                <a href="https://www.prisma.io/docs" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Prisma ORM Docs ↗
+                </a>
               </div>
             </div>
           </div>
