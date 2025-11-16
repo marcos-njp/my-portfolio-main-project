@@ -36,20 +36,17 @@ export default function DocsLayout({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-22">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
         <div className="flex gap-6 lg:gap-8">
           {/* Sidebar */}
           <Suspense fallback={<div className="hidden md:block w-64 flex-shrink-0" />}>
-            <div className="hidden md:block sticky top-16 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] w-64 flex-shrink-0 overflow-y-auto">
+            <aside className="hidden md:block w-64 flex-shrink-0 sticky top-20 h-[calc(100vh-80px)] overflow-y-auto">
               <DocsSidebar />
-            </div>
-            <div className="md:hidden">
-              <DocsSidebar />
-            </div>
+            </aside>
           </Suspense>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0 w-full">
+          <main className="flex-1 min-w-0 w-full py-6 md:py-8">
             <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:scroll-mt-24">
               {children}
             </div>
