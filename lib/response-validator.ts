@@ -28,7 +28,7 @@ const GENZ_SLANG = new Set([
   
   // Situational (medium-frequency) - use sparingly
   'it\'s giving', 'ate', 'delulu', 'npc', 'main character', 'rizz', 'touch grass',
-  'iykyk', 'smh', 'mid', 'sus', 'vibe', 'bussin', 'fire', 'goated',
+  'iykyk', 'smh', 'mid', 'sus', 'vibe', 'fire', 'goated',
   
   // Brainrot tier (spicy) - for flavor, not spam
   'slaps', 'goes hard', 'built different', 'real', 'fax', 'on god', 'deadass',
@@ -72,25 +72,31 @@ function validateGenZMode(response: string): ValidationResult {
   // Calculate score (0-100)
   let score = 0;
   
-  // Slang contribution (40 points max)
+  // Slang contribution (50 points max - INCREASED weight)
   if (hasSlang) {
-    score += Math.min(40, slangCount * 15);
+    score += Math.min(50, slangCount * 20); // More generous
   }
   
   // Emoji contribution (30 points max)
   if (hasEmoji) {
-    score += Math.min(30, emojiCount * 10);
+    score += Math.min(30, emojiCount * 15); // More generous
   }
   
-  // Casual start (30 points)
+  // Casual start (20 points)
   if (hasCasualStart) {
-    score += 30;
+    score += 20;
   }
   
-  // Lowercase usage bonus (check first 20 chars)
-  const firstPart = response.substring(0, 20);
-  const lowercaseRatio = firstPart.split('').filter(c => c === c.toLowerCase()).length / firstPart.length;
-  if (lowercaseRatio > 0.7) {
+  // Lowercase usage bonus (check first 30 chars for better accuracy)
+  const firstPart = response.substring(0, 30);
+  const lowercaseRatio = firstPart.split('').filter(c => c === c.toLowerCase() && c !== ' ').length / firstPart.replace(/\s/g, '').length;
+  if (lowercaseRatio > 0.6) {
+    score += 15; // Increased bonus
+  }
+  
+  // Contraction bonus (i'm, that's, it's, etc.)
+  const hasContractions = /\w+'\w+/.test(response);
+  if (hasContractions) {
     score += 10;
   }
   
@@ -103,13 +109,13 @@ function validateGenZMode(response: string): ValidationResult {
     warnings: warnings.length > 0 ? warnings : undefined,
   };
   
-  // Compliance check (LOWERED threshold - need at least 40 points for more casual acceptance)
-  if (score < 40) {
+  // LOWERED threshold - accept at 35+ points (more lenient)
+  if (score < 35) {
     return {
       compliant: false,
       reason: !hasSlang && !hasEmoji ? 
-        'Missing GenZ slang and emojis - response too formal' : 
-        'Response needs more GenZ personality (add slang or emojis)',
+        'Missing GenZ vibe - needs slang, emojis, or casual style' : 
+        'Response needs more casual energy',
       score,
       details,
     };
