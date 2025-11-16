@@ -6,7 +6,7 @@ import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
 import { findRelevantFAQPatterns } from '@/lib/interviewer-faqs';
 import { preprocessQuery } from '@/lib/query-preprocessor';
 import { getResponseLengthInstruction } from '@/lib/response-manager';
-import { getMoodConfig, type AIMood } from '@/lib/ai-moods';
+import { getMoodConfig, getPersonaResponse, type AIMood } from '@/lib/ai-moods';
 import { 
   saveConversationHistory, 
   loadConversationHistory,
@@ -78,6 +78,8 @@ Good: "I built an AI-Powered Portfolio with RAG using Next.js 15, Groq AI, and U
 STYLE: Specific, confident, and helpful. Use real data from context.`;
 
 export async function POST(req: Request) {
+  let mood: AIMood = 'professional'; // Declare outside try block for error handler access
+  
   try {
     // Validate environment variables at runtime
     if (!process.env.GROQ_API_KEY) {
@@ -104,11 +106,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const { messages, mood = 'professional', sessionId } = await req.json() as { 
+    const { messages, mood: requestMood = 'professional', sessionId } = await req.json() as { 
       messages: Message[];
       mood?: AIMood;
       sessionId?: string;
     };
+    mood = requestMood; // Assign to outer variable
     
     // Get the latest user message
     const lastMessage = messages[messages.length - 1];
@@ -174,9 +177,7 @@ export async function POST(req: Request) {
       validation = validateQuery(cleanQuery);
       
       if (!validation.isValid) {
-        const invalidMessage = mood === 'genz'
-          ? "That's not my vibe chief, we talking about my portfolio here fr 🔥 Ask about my projects, skills, or experience"
-          : validation.reason || "Please ask about my professional background, skills, or projects.";
+        const invalidMessage = getPersonaResponse('unrelated', mood);
         
         return new Response(
           JSON.stringify({ 
@@ -224,20 +225,8 @@ export async function POST(req: Request) {
     if (!hasGoodContext && !hasContextHints && !isShortFollowUp && !isFollowUpResponse) {
       console.log(`[STRICT VALIDATION] No relevant context found (topScore: ${ragContext.topScore.toFixed(2)}, chunks: ${ragContext.chunksUsed}) for: "${cleanQuery}"`);
       
-      // Suggest related topics based on query category
-      const fallbackSuggestions = validation.category === 'projects' 
-        ? "summarize the most impressive projects"
-        : validation.category === 'skills'
-        ? "list the main technical skills and expertise areas"
-        : validation.category === 'experience'
-        ? "describe the work experience and roles"
-        : validation.category === 'education'
-        ? "tell me about educational background and university"
-        : "tell me about the career highlights and achievements";
-      
-      const rejectionMessage = mood === 'genz'
-        ? `Yo, I don't have that info in my knowledge base fr 😅 But I can ${fallbackSuggestions}! Want me to share that instead? 🔥`
-        : `I don't have specific information about that in my knowledge base. However, I can ${fallbackSuggestions}. Would you like to know about that instead?`;
+      // Use persona-aware fallback response
+      const rejectionMessage = getPersonaResponse('no_context', mood);
       
       return new Response(
         JSON.stringify({ 
@@ -376,10 +365,12 @@ export async function POST(req: Request) {
     
     if (isRateLimit) {
       console.error('❌ Groq API rate limit exceeded');
+      const rateLimitMessage = getPersonaResponse('rate_limit', mood || 'professional');
+      
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded',
-          message: 'Too many requests. Please wait a moment and try again.',
+          message: rateLimitMessage,
           timestamp: new Date().toISOString()
         }),
         {
