@@ -23,6 +23,13 @@ import {
   getUnprofessionalRejection,
   type FeedbackPreferences,
 } from '@/lib/feedback-detector';
+import {
+  performSecurityCheck,
+  sanitizeOutput,
+  validateOutputSafety,
+  getSecurityViolationResponse,
+} from '@/lib/security-guard';
+import { logChatInteraction } from '@/lib/chat-logger';
 
 // Edge Runtime configuration for Vercel
 export const runtime = 'edge';
