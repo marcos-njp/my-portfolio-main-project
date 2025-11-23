@@ -50,7 +50,7 @@ const PROFESSIONAL_KEYWORDS = [
 // Irrelevant keywords - OPTIMIZED
 const IRRELEVANT_KEYWORDS = [
   // Personal/Private (keep these)
-  'girlfriend', 'boyfriend', 'dating', 'relationship', 'family', 'parents', 'sibling',
+  'girlfriend', 'boyfriend', 'dating', 'relationship', 'family', 'parents', 'sibling', 'father', 'mother',
   'home address', 'phone number', 'bank', 'credit card', 'password', 'ssn', 'social security',
   
   // Inappropriate (keep these)
