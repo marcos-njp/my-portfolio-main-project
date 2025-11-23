@@ -163,6 +163,34 @@ export async function POST(req: Request) {
         }
       );
     }
+
+    // ========== STEP 0.1: Check for Follow-Ups (Detect Early) ==========
+    const isShortFollowUp = cleanQuery.length < 15 && sessionHistory.length > 0;
+    const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
+    const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
+
+    // ========== STEP 0.3: Validate Query (Filter Irrelevant/Inappropriate) ==========
+    const validation = validateQuery(cleanQuery);
+    
+      // --- Mood-aware fallback logic for blocked queries (added Nov 2025) ---
+      // If the query is invalid and not a short follow-up or follow-up response,
+      // return a mood-aware fallback message instead of the default validator message.
+      if (!validation.isValid && !isShortFollowUp && !isFollowUpResponse) {
+        console.log(`[Query Validation] Rejected: "${cleanQuery}" - Reason: ${validation.reason}`);
+        // Use mood-aware fallback response for blocked queries
+        const fallbackMessage = getPersonaResponse('unrelated', mood);
+        return new Response(
+          JSON.stringify({ 
+            error: 'invalid_query',
+            message: fallbackMessage
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }
+      // --- End mood-aware fallback logic ---
     
     // Enhance query with professional terms if detected
     const enhancedQuery = enhanceQuery(cleanQuery);
