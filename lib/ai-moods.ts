@@ -192,7 +192,7 @@ export function getPersonaResponse(
     },
     manipulation: {
       professional: "I maintain professional standards. Please ask about Niño's development experience, technical skills, or career goals.",
-      genz: "nah bro, that's not the vibe 💀 ask me about projects or skills instead fr",
+      genz: "nah bro, you trippin' 💀 ask me about projects or skills instead fr",
     },
     rate_limit: {
       professional: "I'm receiving too many requests right now. Please wait a moment and try again.",

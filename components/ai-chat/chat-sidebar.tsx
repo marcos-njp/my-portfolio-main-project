@@ -202,7 +202,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 4000);
+    }, 6000);
 
     const stage2Timeout = setTimeout(() => {
       setMessages((prev) => {
@@ -213,7 +213,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 8000);
+    }, 10000);
 
     const abortTimeout = setTimeout(() => {
       controller.abort();
@@ -223,12 +223,12 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: "Request timed out. Please try again or ask something simpler.",
+          content: "Request timed out. Token exceeded its rate. Wait for a few seconds.",
         },
       ]);
       setIsLoading(false);
       setAbortController(null);
-    }, 12000);
+    }, 15000);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${submissionMood}, sessionId: ${sessionId}`);
 
