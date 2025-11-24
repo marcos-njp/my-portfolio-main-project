@@ -184,7 +184,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 500);
+    }, 4000);
     setInput("");
     setIsLoading(true);
 
@@ -202,7 +202,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 6000);
+    }, 8000);
 
     const stage2Timeout = setTimeout(() => {
       setMessages((prev) => {
@@ -213,7 +213,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 10000);
+    }, 16000);
 
     const abortTimeout = setTimeout(() => {
       controller.abort();
@@ -228,7 +228,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       ]);
       setIsLoading(false);
       setAbortController(null);
-    }, 15000);
+    }, 24000);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${submissionMood}, sessionId: ${sessionId}`);
 
