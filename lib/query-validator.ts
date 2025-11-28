@@ -160,7 +160,7 @@ export function validateQuery(query: string): ValidationResult {
   
   // Calculate professional relevance using semantic patterns
   let professionalScore = 0;
-  let matchedCategories: string[] = [];
+  const matchedCategories: string[] = [];
   
   for (const [category, pattern] of Object.entries(PROFESSIONAL_PATTERNS)) {
     if (pattern.test(queryLower)) {

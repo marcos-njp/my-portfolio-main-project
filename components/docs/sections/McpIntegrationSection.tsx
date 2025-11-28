@@ -80,7 +80,7 @@ export function McpIntegrationSection() {
             <div className="space-y-1 text-xs">
               <p><strong>Parameters:</strong></p>
               <p>• message (required): Your question or conversation</p>
-              <p>• mood (optional): "professional" or "genz"</p> 
+              <p>• mood (optional): &ldquo;professional&rdquo; or &ldquo;genz&rdquo;</p> 
               <p>• sessionId (optional): Conversation continuity & feedback preferences</p>
             </div>
           </HighlightBox>

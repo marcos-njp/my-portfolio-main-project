@@ -221,12 +221,15 @@ export async function POST(req: Request) {
     }
 
     // ========== STEP 1.5: FAQ Pattern Matching (Boost Interview Questions) ==========
+    // FAQ patterns provide CONTEXT HINTS to guide RAG search to relevant chunks
+    // They don't replace RAG - they help RAG find the right chunks in the vector database
+    // Example: "Tell me about yourself" → guides RAG to chunks 1,8,9,13-16 (profile, achievements, projects)
     const faqMatches = findRelevantFAQPatterns(cleanQuery);
     let faqContextHints = '';
     
     if (faqMatches.length > 0) {
       faqContextHints = buildContextHints(faqMatches);
-      console.log(`[FAQ Boost] Matched ${faqMatches.length} FAQ patterns - boosting RAG search`);
+      console.log(`[FAQ Boost] Matched ${faqMatches.length} FAQ patterns - directing RAG to specific chunks`);
     }
 
     // ========== STEP 2: Vector Search with RAG ==========
@@ -252,7 +255,7 @@ export async function POST(req: Request) {
       console.log(`[Smart Fallback] RAG Score: ${ragContext.topScore.toFixed(2)}, Chunks: ${ragContext.chunksUsed}, Context Relevant: ${contextRelevance.isRelevant}`);
       
       // Use smart knowledge gap detection for better fallback messages
-      const smartFallback = getSmartFallbackResponse(cleanQuery, mood, ragContext.topScore);
+      const smartFallback = getSmartFallbackResponse(cleanQuery, mood);
       
       return new Response(
         JSON.stringify({ 

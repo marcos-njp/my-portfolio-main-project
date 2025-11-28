@@ -148,8 +148,7 @@ export function getAllMoods(): MoodConfig[] {
  */
 export function getPersonaResponse(
   type: 'no_context' | 'unrelated' | 'manipulation' | 'rate_limit' | 'error' | 'too_short' | 'knowledge_gap' | 'tech_preferences' | 'entertainment' | 'personal' | 'inappropriate',
-  mood: AIMood,
-  query?: string
+  mood: AIMood
 ): string {
   const responses = {
     no_context: {
@@ -208,14 +207,13 @@ export function getPersonaResponse(
  */
 export function getSmartFallbackResponse(
   query: string,
-  mood: AIMood,
-  ragScore: number = 0
+  mood: AIMood
 ): string {
   // Check if it's a knowledge gap question (timeline, metrics, etc.)
   if (/how long|timeline|duration|how many|users|downloads|metrics|salary|income/.test(query.toLowerCase())) {
-    return getPersonaResponse('knowledge_gap', mood, query);
+    return getPersonaResponse('knowledge_gap', mood);
   }
   
   // Fall back to generic no_context response
-  return getPersonaResponse('no_context', mood, query);
+  return getPersonaResponse('no_context', mood);
 }

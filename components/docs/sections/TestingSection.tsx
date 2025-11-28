@@ -1,4 +1,4 @@
-import { Sparkles, Zap, AlertCircle, TestTube, Target, TrendingUp } from "lucide-react";
+import { Sparkles, Zap, TestTube, Target, TrendingUp } from "lucide-react";
 import { 
   DocSection, 
   AlertBox, 

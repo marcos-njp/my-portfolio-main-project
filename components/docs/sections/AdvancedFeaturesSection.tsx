@@ -93,19 +93,19 @@ export async function saveConversationHistory(
             <div className="space-y-2">
               <h4 className="font-medium text-sm">Professional Responses</h4>
               <div className="space-y-1 text-xs">
-                <p><strong>unrelated:</strong> "I'm here to discuss Niño's professional background..."</p>
-                <p><strong>too_short:</strong> "Please ask a more specific question about my skills..."</p>
-                <p><strong>knowledge_gap:</strong> "I don't have that specific information documented..."</p>
-                <p><strong>tech_preferences:</strong> "I focus on discussing my professional development work..."</p>
+                <p><strong>unrelated:</strong> &ldquo;I&rsquo;m here to discuss Niño&rsquo;s professional background...&rdquo;</p>
+                <p><strong>too_short:</strong> &ldquo;Please ask a more specific question about my skills...&rdquo;</p>
+                <p><strong>knowledge_gap:</strong> &ldquo;I don&rsquo;t have that specific information documented...&rdquo;</p>
+                <p><strong>tech_preferences:</strong> &ldquo;I focus on discussing my professional development work...&rdquo;</p>
               </div>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium text-sm">GenZ Responses</h4>
               <div className="space-y-1 text-xs">
-                <p><strong>unrelated:</strong> "yo that's off topic 💀 let's talk about the portfolio stuff..."</p>
-                <p><strong>too_short:</strong> "bro that's too short 😭 gimme more details..."</p>
-                <p><strong>knowledge_gap:</strong> "yo don't have those exact deets 😅 but i can break down..."</p>
-                <p><strong>tech_preferences:</strong> "yo we keeping this about my dev work and projects fr 💻..."</p>
+                <p><strong>unrelated:</strong> &ldquo;yo that&rsquo;s off topic 💀 let&rsquo;s talk about the portfolio stuff...&rdquo;</p>
+                <p><strong>too_short:</strong> &ldquo;bro that&rsquo;s too short 😭 gimme more details...&rdquo;</p>
+                <p><strong>knowledge_gap:</strong> &ldquo;yo don&rsquo;t have those exact deets 😅 but i can break down...&rdquo;</p>
+                <p><strong>tech_preferences:</strong> &ldquo;yo we keeping this about my dev work and projects fr 💻...&rdquo;</p>
               </div>
             </div>
           </div>
@@ -214,12 +214,12 @@ export function validateQuery(query: string): ValidationResult {
       content: (
         <div className="space-y-4">
           <HighlightBox type="success" title="User Preference Learning">
-            <p className="text-xs">System learns from user feedback ('be more detailed', 'shorter responses') and applies preferences consistently throughout the session</p>
+            <p className="text-xs">System learns from user feedback (&lsquo;be more detailed&rsquo;, &lsquo;shorter responses&rsquo;) and applies preferences consistently throughout the session</p>
           </HighlightBox>
 
           <div className="grid md:grid-cols-3 gap-4">
             <HighlightBox type="info" title="Length Adaptation">
-              <p className="text-xs">Detects "too long/short" feedback and adjusts response length</p>
+              <p className="text-xs">Detects &ldquo;too long/short&rdquo; feedback and adjusts response length</p>
             </HighlightBox>
             <HighlightBox type="info" title="Detail Control">
               <p className="text-xs">Learns preference for specific examples vs high-level overviews</p>

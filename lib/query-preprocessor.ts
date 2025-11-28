@@ -92,30 +92,39 @@ function levenshteinDistance(str1: string, str2: string): number {
 }
 
 /**
- * Smart correction for key professional terms only
+ * Smart correction for key professional terms using fuzzy matching
  */
 export function correctKeyTerms(query: string): string {
   // Focus on most commonly misspelled professional terms
-  const keyTerms = {
-    'programming': ['programing', 'programmin', 'progamming'],
-    'experience': ['experiance', 'experince', 'expereince'],
-    'development': ['developement', 'devlopment', 'develpoment'],
-    'projects': ['projets', 'projetcs', 'porjects'],
-    'skills': ['skilss', 'skils', 'skiils'],
-    'technical': ['tecnical', 'techincal', 'technincal'],
-    'education': ['educaton', 'educaiton', 'educaion'],
-    'university': ['unversity', 'universtiy', 'univeristy']
-  };
+  const keyTerms = ['programming', 'experience', 'development', 'projects', 'skills', 'technical', 'education', 'university'];
   
-  let corrected = query;
-  for (const [correct, misspellings] of Object.entries(keyTerms)) {
-    for (const misspelling of misspellings) {
-      const regex = new RegExp(`\\b${misspelling}\\b`, 'gi');
-      corrected = corrected.replace(regex, correct);
+  const words = query.split(/\s+/);
+  
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i].toLowerCase().replace(/[.,!?;:]$/, '');
+    
+    // Skip if word is too short or already correct
+    if (word.length < 4 || keyTerms.includes(word)) continue;
+    
+    // Find best match using Levenshtein distance
+    let bestMatch = word;
+    let minDistance = Math.floor(word.length * 0.4); // Max 40% character changes
+    
+    for (const term of keyTerms) {
+      const distance = levenshteinDistance(word, term);
+      if (distance < minDistance && distance <= 3) { // Max 3 character changes
+        minDistance = distance;
+        bestMatch = term;
+      }
+    }
+    
+    if (bestMatch !== word) {
+      const punctuation = words[i].slice(word.length);
+      words[i] = bestMatch + punctuation;
     }
   }
   
-  return corrected;
+  return words.join(' ');
 }
 
 /**

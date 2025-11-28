@@ -192,8 +192,7 @@ export function validateMoodCompliance(
  */
 export function logValidationResult(
   validation: ValidationResult,
-  mood: AIMood,
-  response: string
+  mood: AIMood
 ): void {
   const scoreColor = validation.score >= 80 ? '✅' : validation.score >= 50 ? '⚠️' : '❌';
   

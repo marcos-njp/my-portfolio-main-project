@@ -1,9 +1,4 @@
-﻿import { Database, CheckCircle, Star } from "lucide-react";
-import { 
-  DocSection, 
-  AlertBox, 
-  HighlightBox 
-} from "@/components/docs/common";
+﻿import { Database, CheckCircle } from "lucide-react";
 import { StarCard } from "@/components/docs";
 
 export function ProfileDataSection() {

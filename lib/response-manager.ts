@@ -34,7 +34,8 @@ export function countWords(text: string): number {
  * Get response length instruction for system prompt
  */
 export function getResponseLengthInstruction(constraints: LengthConstraints = DEFAULT_CONSTRAINTS): string {
-  return `\nLENGTH: 2-4 sentences (simple Q), 4-6 sentences (complex Q). Use bullet points for lists. Be specific (names, tech, numbers). Quality > length.`;
+  const maxWords = Math.floor(constraints.maxTokens * 0.75); // Rough token-to-word conversion
+  return `\nLENGTH: 2-4 sentences (simple Q), 4-6 sentences (complex Q). Target ~${maxWords} words max. Use bullet points for lists. Be specific (names, tech, numbers). Quality > length.`;
 }
 
 /**
@@ -78,7 +79,7 @@ export function shouldManageLength(response: string, constraints: LengthConstrai
 /**
  * Add helpful follow-up suggestion based on topic
  */
-export function addFollowUpPrompt(response: string, _queryContext: string): string {
+export function addFollowUpPrompt(response: string): string {
   const wordCount = countWords(response);
   
   // Only add for longer responses

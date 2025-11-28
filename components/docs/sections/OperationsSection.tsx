@@ -1,9 +1,7 @@
-import { CheckCircle, AlertTriangle, Zap } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { 
-  DocSection, 
   AlertBox, 
-  CodeBlock,
-  HighlightBox 
+  CodeBlock
 } from "@/components/docs/common";
 import { TroubleshootCard } from "@/components/docs";
 

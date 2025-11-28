@@ -1,4 +1,4 @@
-import { Brain, Shield, Zap, AlertCircle, Database, Code } from "lucide-react";
+import { Brain, Shield, Zap, AlertCircle, Database } from "lucide-react";
 import { 
   DocSection, 
   AlertBox, 
@@ -80,7 +80,7 @@ export function PersonalitySystemSection() {
 
       <AlertBox type="info" icon={Brain} title="The Problem We Solved">
         <p>
-          Generic AI chatbots give vague, cookie-cutter responses and fail at follow-up questions. They say things like "I can answer questions about my experience" 
+          Generic AI chatbots give vague, cookie-cutter responses and fail at follow-up questions. They say things like &ldquo;I can answer questions about my experience&rdquo; 
           instead of providing specific, authentic information. They also leak personality traits between modes and give the same error messages regardless of context. 
           Our system solves this with dual storage memory, persona-aware error handling, and strict personality validation.
         </p>
@@ -155,11 +155,11 @@ export function PersonalitySystemSection() {
               <div className="grid md:grid-cols-2 gap-3 text-xs">
                 <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded">
                   <p className="font-medium text-blue-700 dark:text-blue-300 mb-1">Professional</p>
-                  <p className="text-muted-foreground">"{error.professional}"</p>
+                  <p className="text-muted-foreground">&ldquo;{error.professional}&rdquo;</p>
                 </div>
                 <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded">
                   <p className="font-medium text-purple-700 dark:text-purple-300 mb-1">GenZ</p>
-                  <p className="text-muted-foreground">"{error.genz}"</p>
+                  <p className="text-muted-foreground">&ldquo;{error.genz}&rdquo;</p>
                 </div>
               </div>
             </div>
