@@ -2,7 +2,7 @@
 
 An AI-powered digital twin portfolio featuring advanced conversational AI, RAG architecture, and dual personality modes. Built with Next.js 15, Groq AI, and modern web technologies.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -18,7 +18,7 @@ pnpm start
 
 Visit `http://localhost:3000`
 
-## 🤖 AI Digital Twin Features
+## AI Digital Twin Features
 
 ### Dual Personality System
 - **Professional Mode**: Formal, technical responses for business contexts
@@ -38,7 +38,7 @@ Visit `http://localhost:3000`
 - **Knowledge Gap Detection**: Smart detection of unanswerable questions with graceful fallbacks
 - **Error Handling**: Context-aware responses for missing information
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Core Framework
 - **Next.js 15**: App Router with Turbopack for fast builds
@@ -61,7 +61,7 @@ Visit `http://localhost:3000`
 - **Prettier**: Code formatting
 - **MCP Protocol**: Model Context Protocol integration
 
-## 📁 Project Architecture
+## Project Architecture
 
 ```
 app/
@@ -93,7 +93,7 @@ data/
 └── readmeData.md     # Vector database content
 ```
 
-## 🔧 Environment Setup
+## Environment Setup
 
 Create `.env.local` with required API keys:
 
@@ -115,7 +115,7 @@ UPSTASH_REDIS_REST_TOKEN=your_redis_token_here
 2. **Upstash Vector**: Create database at [upstash.com/vector](https://upstash.com/vector)
 3. **Upstash Redis**: Create database at [upstash.com/redis](https://upstash.com/redis)
 
-## 🗄️ Data Management
+## Data Management
 
 ### Vector Database Setup
 ```bash
@@ -130,7 +130,7 @@ This script processes `data/readmeData.md` and populates the vector database for
 - **`personality.json`**: Response templates and mood configurations
 - **`readmeData.md`**: Knowledge base content for vector search
 
-## 🚢 Deployment
+## Deployment
 
 ### Vercel (Recommended)
 1. Fork this repository
@@ -153,40 +153,40 @@ Ensure all environment variables are set in your deployment platform:
 - Preview: Same as production for testing
 - Development: Use `.env.local` for local development
 
-## 📊 Key Features
+## Key Features
 
-### 🧠 Intelligent Conversations
+### Intelligent Conversations
 - Context-aware responses based on conversation history
 - Personality consistency across sessions
 - Smart follow-up question generation
 - Semantic understanding of user intent
 
-### 🔍 Advanced Search
+### Advanced Search
 - Vector-based semantic search through portfolio content
 - RAG (Retrieval Augmented Generation) for accurate responses
 - Real-time content retrieval and synthesis
 - Conversation memory for context retention
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 - Responsive design for all device sizes
 - Dark/light mode with system preference detection
 - Smooth animations and micro-interactions
 - Accessible design following WCAG guidelines
 
-### ⚡ Performance
+### Performance
 - Next.js 15 with Turbopack for fast builds
 - Optimized bundle sizes with code splitting
 - Edge runtime for global low latency
 - Efficient caching strategies
 
-## 🔗 Documentation
+## Documentation
 
 - **[Full Documentation](/docs)**: Complete project documentation
 - **[AI Setup Guide](agents.md)**: Detailed AI configuration
 - **[Component Guide](/docs?section=lib-utilities)**: Reusable component library
 - **[API Reference](/docs?section=operations)**: API endpoints and usage
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal portfolio project, but feedback and suggestions are welcome!
 
@@ -195,7 +195,7 @@ This is a personal portfolio project, but feedback and suggestions are welcome!
 3. Make your changes
 4. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - feel free to use this project as inspiration for your own portfolio.
 
