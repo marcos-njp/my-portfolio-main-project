@@ -2,13 +2,61 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { type AIMood } from "@/lib/ai-moods";
+import { type AIMood, getPersonaResponse } from "@/lib/ai-moods";
 import { X, Sparkles } from "lucide-react";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { MoodSelector } from "./mood-selector";
 import { SuggestedQuestions } from "./suggested-questions";
 import { ChatFeaturesModal } from "./chat-features-modal";
+
+/**
+ * Generate smart suggestions based on conversation context
+ * Fixed: Better validation-friendly questions and improved logic
+ */
+function getSmartSuggestions(messages: Message[], clickCount: number): string[] {
+  // Validation-friendly core questions (avoid getting flagged)
+  const coreQuestions = [
+    "What are your main projects?", // Matches original format
+    "Tell me about your tech stack", // Matches original format
+    "What competitions have you won?" // Matches original format
+  ];
+  
+  // Follow-up questions for second interaction
+  const followupQuestions = [
+    "What's your experience?", 
+    "Tell me about your education"
+  ];
+  
+  // If no meaningful conversation yet (only welcome message), show core questions
+  const meaningfulMessages = messages.filter(m => m.id !== 'welcome' && !m.content.includes('Thinking'));
+  
+  if (meaningfulMessages.length <= 1) {
+    return coreQuestions;
+  }
+  
+  // After first interaction, show contextual follow-ups
+  if (clickCount === 0) {
+    return coreQuestions;
+  }
+  
+  // Analyze conversation for smart follow-ups
+  const lastAssistantMsg = messages
+    .filter(m => m.role === 'assistant' && m.id !== 'welcome')
+    .pop()?.content.toLowerCase() || '';
+  
+  // Context-aware suggestions based on AI's last response
+  if (lastAssistantMsg.includes('project') && !lastAssistantMsg.includes('thinking')) {
+    return ["What technologies did you use?", "Any interesting challenges?"];
+  } else if (lastAssistantMsg.includes('competition') || lastAssistantMsg.includes('hackathon')) {
+    return ["How did you approach it?", "What was the outcome?"];
+  } else if (lastAssistantMsg.includes('education') || lastAssistantMsg.includes('university')) {
+    return ["What did you study?", "Any notable achievements?"];
+  }
+  
+  // Safe fallback to avoid validator issues
+  return followupQuestions;
+}
 
 interface Message {
   id: string;
@@ -21,13 +69,14 @@ interface ChatSidebarProps {
   onClose: () => void;
 }
 
-const SUGGESTIONS = [
-  "What are your top skills?",
-  "Tell me about your projects",
-  "What's your education background?",
-];
-
+/**
+ * ChatSidebar Component
+ * 
+ * Main chat interface for AI digital twin interaction.
+ * Features: Real-time chat, session persistence, mood switching, conversation history
+ */
 export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
+  // Message state
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -35,17 +84,24 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       content: "Hey, I am Niño's Digital Twin! Ask me anything about my skills, projects, or experience.",
     },
   ]);
+  
+  // Input and loading states
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  
+  // Modal and UI states
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
-  const [_thinkingTimeout, _setThinkingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [_thinkingInterval, _setThinkingInterval] = useState<NodeJS.Timeout | null>(null);
-  const [_abortController, setAbortController] = useState<AbortController | null>(null);
-  const [currentMood, setCurrentMood] = useState<AIMood>("professional");
   const [questionClickCount, setQuestionClickCount] = useState(0);
   
+  // AI mood/personality state
+  const [currentMood, setCurrentMood] = useState<AIMood>("professional");
+  
+  /**
+   * Generate or restore session ID for conversation persistence
+   * Session IDs are stored in localStorage to maintain history across page reloads
+   */
   const [sessionId] = useState(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('ai_chat_session_id');
@@ -64,16 +120,50 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Initialize suggestion click count from localStorage for this session
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`suggestion_clicks_${sessionId}`);
+      if (stored) {
+        setQuestionClickCount(parseInt(stored));
+        console.log(`[Suggestions] Restored click count: ${stored} for session ${sessionId}`);
+      }
+    }
+  }, [sessionId]);
+
+  // Reset suggestions when starting fresh conversation
+  const resetSuggestions = () => {
+    setQuestionClickCount(0);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`suggestion_clicks_${sessionId}`);
+    }
+    console.log('[Suggestions] Reset click count');
+  };
+
+  // Save click count to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && questionClickCount > 0) {
+      localStorage.setItem(`suggestion_clicks_${sessionId}`, questionClickCount.toString());
+    }
+  }, [questionClickCount, sessionId]);
+
   console.log(`[Session] ID: ${sessionId}, Mood: ${currentMood}`);
 
-  // Load chat history from Redis on first open
+  /**
+   * Load chat history from Redis when sidebar first opens
+   * Only runs once per session to avoid unnecessary API calls
+   */
   useEffect(() => {
     if (isOpen && !hasLoadedHistory) {
       loadChatHistory();
       setHasLoadedHistory(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, hasLoadedHistory]);
 
+  /**
+   * Load conversation history from Redis for this session
+   */
   const loadChatHistory = async () => {
     setIsLoadingHistory(true);
     try {
@@ -87,14 +177,13 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         const data = await response.json();
         if (data.messages && data.messages.length > 0) {
           console.log(`[Chat History] Loaded ${data.messages.length} messages from session`);
-          // Restore messages from history (excluding welcome message)
           setMessages([
             {
               id: "welcome",
               role: "assistant",
               content: "Hey, I am Niño's Digital Twin! Ask me anything about my skills, projects, or experience.",
             },
-            ...data.messages.map((msg: any, idx: number) => ({
+            ...data.messages.map((msg: { role: string; content: string; timestamp: number }, idx: number) => ({
               id: `history-${msg.timestamp || Date.now()}-${idx}`,
               role: msg.role,
               content: msg.content,
@@ -127,6 +216,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       // Clear localStorage session
       localStorage.removeItem('ai_chat_session_id');
       
+      // Reset question click count properly
+      resetSuggestions();
+      
       console.log('[Chat History] Cleared session and reloading...');
       
       // Reload the page to start fresh
@@ -141,17 +233,24 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /**
+   * Log mood changes for debugging
+   * Note: Mood changes do NOT clear conversation history - mood only affects new messages
+   */
   useEffect(() => {
     console.log(`[Mood Change] New mood: ${currentMood}`);
-    // Do NOT clear the conversation on mood change.
-    // Mood now applies to the next message only; keep history intact for context.
   }, [currentMood]);
 
+  /**
+   * Handle chat message submission
+   * Validates input, shows loading states, makes API call, handles streaming response
+   * Includes progressive timeout stages and abort controller for request cancellation
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    // Capture the current mood at submission time to ensure it's the latest
+    // Capture current mood for this specific message
     const submissionMood = currentMood;
     console.log(`[Mood Debug] Mood at submission: ${submissionMood}`);
 
@@ -171,7 +270,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       },
     ]);
     
-    // Animate thinking dots
+    // Animate thinking dots (updates every 500ms for smooth animation)
     let dotCount = 0;
     const thinkingInterval = setInterval(() => {
       dotCount = (dotCount + 1) % 4;
@@ -184,15 +283,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 4000);
+    }, 500);
     setInput("");
     setIsLoading(true);
 
-    // Create abort controller for request termination
+    // Create abort controller for request cancellation (if timeout occurs)
     const controller = new AbortController();
-    setAbortController(controller);
 
-    // Progressive timeout stages
+    // Progressive timeout stages - Update UI to show progress
+    // Stage 1: After 8s, show "Processing" message
     const stage1Timeout = setTimeout(() => {
       setMessages((prev) => {
         const newMessages = [...prev];
@@ -204,6 +303,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       });
     }, 8000);
 
+    // Stage 2: After 18s, show "Almost there" message
     const stage2Timeout = setTimeout(() => {
       setMessages((prev) => {
         const newMessages = [...prev];
@@ -213,8 +313,10 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         }
         return newMessages;
       });
-    }, 16000);
+    }, 18000);
 
+    // Abort timeout: After 30s, cancel request and show timeout message
+    // Increased from 24s to 30s to give backend more time to process complex queries
     const abortTimeout = setTimeout(() => {
       controller.abort();
       clearInterval(thinkingInterval);
@@ -223,12 +325,11 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: "Request timed out. Token exceeded its rate. Wait for a few seconds.",
+          content: getPersonaResponse('error', submissionMood), // Use error response for timeouts
         },
       ]);
       setIsLoading(false);
-      setAbortController(null);
-    }, 24000);
+    }, 30000);
 
     console.log(`[API Call] 🚀 Sending query: "${input.trim()}" with mood: ${submissionMood}, sessionId: ${sessionId}`);
 
@@ -257,9 +358,9 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       clearTimeout(abortTimeout);
       clearInterval(thinkingInterval);
 
+      // Handle validation errors (400 Bad Request)
       if (response.status === 400) {
         const errorData = await response.json();
-        // Update the thinking message with error
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
@@ -269,40 +370,39 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
           return newMessages;
         });
         setIsLoading(false);
-        setAbortController(null);
         return;
       }
 
+      // Handle rate limit errors (429 Too Many Requests)
       if (response.status === 429) {
-        // Groq API rate limit hit
         console.error('[API Error] Rate limit exceeded');
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
           if (lastMessage.role === 'assistant') {
-            lastMessage.content = "Too many requests right now. Wait 30 seconds and try again.";
+            lastMessage.content = getPersonaResponse('rate_limit', submissionMood);
           }
           return newMessages;
         });
         setIsLoading(false);
-        setAbortController(null);
         return;
       }
 
+      // Handle server errors (500 Internal Server Error)
       if (response.status === 500) {
         const errorData = await response.json();
         console.error('[API Error]', errorData);
-        // Update the thinking message with error
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
           if (lastMessage.role === 'assistant') {
-            lastMessage.content = `Server error: ${errorData.message || 'Something went wrong. Try again.'}`;
+            // Use persona response but include server error details if available
+            const baseResponse = getPersonaResponse('error', submissionMood);
+            lastMessage.content = errorData.message ? `${baseResponse} (${errorData.message})` : baseResponse;
           }
           return newMessages;
         });
         setIsLoading(false);
-        setAbortController(null);
         return;
       }
 
@@ -317,9 +417,8 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       }
       
       const decoder = new TextDecoder();
-      const aiResponse = "";
 
-      // Update the existing "Thinking..." message instead of adding a new one
+      // Stream AI response chunks and update the "Thinking..." message in real-time
       let streamedContent = "";
 
       while (true) {
@@ -342,44 +441,43 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       console.log('[API Call] ✅ Full response:', streamedContent);
       
       setIsLoading(false);
-      setAbortController(null);
     } catch (error) {
       console.error("[API Error]", error);
       
-      // CRITICAL: Clear ALL timeouts and intervals on error
+      // CRITICAL: Clear ALL timeouts and intervals on error to prevent memory leaks
       clearTimeout(stage1Timeout);
       clearTimeout(stage2Timeout);
       clearTimeout(abortTimeout);
       clearInterval(thinkingInterval);
       
-      // Don't show error if request was aborted (timeout)
+      // Don't show error message if request was intentionally aborted (timeout scenario)
       if (error instanceof Error && error.name === 'AbortError') {
         console.log('[Request] Aborted due to timeout');
         return;
       }
       
+      // Show persona-aware error message for unexpected failures
       setMessages((prev) => [
         ...prev.slice(0, -1),
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: "Something went wrong. Try again?",
+          content: getPersonaResponse('error', submissionMood), // Use error response for generic errors
         },
       ]);
       setIsLoading(false);
-      setAbortController(null);
     }
   };
 
-  const _handleComment = (_messageId: string, _comment: string, _rating: 'positive' | 'negative') => {
+  /* TO BE INCLUDED: Comment/rating feature for AI responses
+  const handleComment = (messageId: string, comment: string, rating: 'positive' | 'negative') => {
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.id === _messageId ? { ...msg, rating: _rating } : msg
+        msg.id === messageId ? { ...msg, rating } : msg
       )
     );
 
-    // Simple 1-sentence response
-    const aiResponse = _rating === 'positive' 
+    const aiResponse = rating === 'positive' 
       ? "Thank you for the feedback!" 
       : "I'm sorry, I'll try to improve my responses.";
     
@@ -392,9 +490,11 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       },
     ]);
 
-    console.log('[Feedback] User rated response:', _rating, '(NOT saved to DB)');
+    console.log('[Feedback] User rated response:', rating, '(NOT saved to DB)');
   };
+  */
 
+  /* TO BE INCLUDED: Auto-submit suggested questions feature
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
     setTimeout(() => {
@@ -404,6 +504,7 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       }
     }, 100);
   };
+  */
 
   return (
     <>
@@ -471,20 +572,15 @@ export default function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
           </div>
 
           <div className="border-t">
-            {/* Suggested Questions - Hide after 3 clicks */}
-            {questionClickCount < 3 && (
+            {/* Smart Suggested Questions - Hide after 2 clicks or if conversation is active */}
+            {questionClickCount < 2 && messages.length <= 3 && (
               <div className="px-3 py-3 border-b bg-muted/20">
                 <SuggestedQuestions
-                  suggestions={[
-                    "What are your main projects?",
-                    "Tell me about your tech stack",
-                    "What's your experience?",
-                    "What competitions have you won?",
-                    "Tell me about your education",
-                  ]}
+                  suggestions={getSmartSuggestions(messages, questionClickCount)}
                   onSelect={(question) => {
                     setInput(question);
                     setQuestionClickCount(prev => prev + 1);
+                    console.log(`[Suggestions] Question clicked: "${question}", new count: ${questionClickCount + 1}`);
                   }}
                   disabled={isLoading}
                 />

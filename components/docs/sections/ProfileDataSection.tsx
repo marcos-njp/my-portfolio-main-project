@@ -1,4 +1,9 @@
-import { Database, Target, Zap, TrendingUp, Award, CheckCircle } from "lucide-react";
+﻿import { Database, CheckCircle, Star } from "lucide-react";
+import { 
+  DocSection, 
+  AlertBox, 
+  HighlightBox 
+} from "@/components/docs/common";
 import { StarCard } from "@/components/docs";
 
 export function ProfileDataSection() {
@@ -149,7 +154,7 @@ export function ProfileDataSection() {
         <div className="rounded-lg border p-6 space-y-4">
           <StarCard letter="S" title="Situation">
             <p>
-              Initial AI responses were generic ("I can answer questions about...") and follow-up 
+              Initial AI responses were generic (&quot;I can answer questions about...&quot;) and follow-up 
               questions failed to understand context. Token usage was high (1k-3.5k per request), 
               impacting latency and cost.
             </p>

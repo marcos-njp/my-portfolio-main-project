@@ -1,6 +1,170 @@
-import { Code2, Database, Zap, GitBranch, Settings, CheckCircle, ExternalLink } from "lucide-react";
+import { Database, CheckCircle, Zap, Search, Brain, Shield } from "lucide-react";
+import { 
+  DocSection, 
+  AlertBox, 
+  ComparisonGrid, 
+  StepList, 
+  CodeBlock,
+  MetricGrid,
+  HighlightBox,
+  Tabs
+} from "@/components/docs/common";
 
 export function RagArchitectureSection() {
+  const architectureFlow = [
+    {
+      title: "Query Preprocessing",
+      description: "Typo correction, fuzzy matching, and query normalization for better search accuracy"
+    },
+    {
+      title: "Semantic Query Validation", 
+      description: "Dynamic regex patterns detect professional queries with errorType returns for persona-aware responses",
+      content: (
+        <code className="text-xs bg-muted px-2 py-1 rounded">
+          validation.errorType // Returns: unrelated, too_short, manipulation, etc.
+        </code>
+      )
+    },
+    {
+      title: "Vector Search",
+      description: "Semantic search in Upstash Vector with topK=2-3, minScore=0.75 (75% relevance threshold)",
+      content: (
+        <code className="text-xs bg-muted px-2 py-1 rounded">
+          const results = await vectorIndex.query(embedding, {`{topK: 3, minScore: 0.75}`})
+        </code>
+      )
+    },
+    {
+      title: "Context Assembly",
+      description: "Session memory + RAG results + personality rules combined for comprehensive context"
+    },
+    {
+      title: "AI Generation",
+      description: "Groq AI streaming with personality validation and error handling"
+    },
+    {
+      title: "Response Validation",
+      description: "Quality checks and persona consistency verification before delivery"
+    }
+  ];
+
+  const systemMetrics = [
+    { label: "AI Model", value: "Groq AI", description: "llama-3.1-8b-instant" },
+    { label: "Vector DB", value: "Upstash", description: "Serverless semantic search" },
+    { label: "Response Time", value: "<2s", description: "Streaming support" },
+    { label: "Relevance Score", value: "0.75+", description: "75% threshold" }
+  ];
+
+  const validationPatterns = [
+    {
+      name: "Professional Queries",
+      pattern: "/(experience|project|skill|tech|background)/i",
+      result: "Valid - proceeds to RAG search"
+    },
+    {
+      name: "Too Short/Unclear",
+      pattern: "/^.{1,10}$/",
+      result: "too_short - persona-aware error response"
+    },
+    {
+      name: "Unrelated Content", 
+      pattern: "/(weather|recipe|movie|game)/i",
+      result: "unrelated - polite redirection"
+    },
+    {
+      name: "Manipulation Attempts",
+      pattern: "/(ignore|forget|pretend|roleplay)/i", 
+      result: "manipulation - firm boundary response"
+    }
+  ];
+
+  const ragComponents = [
+    {
+      id: "groq",
+      label: "Groq AI",
+      icon: Brain,
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="info" title="Model Configuration">
+            <p className="text-xs mb-2">llama-3.1-8b-instant - Optimized for speed and accuracy</p>
+            <div className="space-y-1">
+              <p>• Temperature: 0.7 (Professional) / 0.9 (GenZ)</p>
+              <p>• Max tokens: 1000</p>
+              <p>• Streaming: Enabled for real-time response</p>
+            </div>
+          </HighlightBox>
+          
+          <CodeBlock title="Integration">
+{`import { createGroq } from '@ai-sdk/groq';
+const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
+
+const { textStream } = await streamText({
+  model: groq('llama-3.1-8b-instant'),
+  messages: [systemPrompt, ...conversationHistory, userMessage],
+  temperature: mood === 'professional' ? 0.7 : 0.9
+});`}
+          </CodeBlock>
+        </div>
+      )
+    },
+    {
+      id: "vector",
+      label: "Upstash Vector", 
+      icon: Database,
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="info" title="Vector Database Setup">
+            <p className="text-xs mb-2">Serverless vector database for semantic search</p>
+            <div className="space-y-1">
+              <p>• Embedding model: text-embedding-3-small</p>
+              <p>• Dimensions: 1536</p>
+              <p>• Distance metric: Cosine similarity</p>
+            </div>
+          </HighlightBox>
+          
+          <CodeBlock title="Search Implementation">
+{`const vectorIndex = new Index({
+  url: process.env.UPSTASH_VECTOR_REST_URL,
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN
+});
+
+const results = await vectorIndex.query({
+  vector: embedding,
+  topK: 3,
+  minScore: 0.75,
+  includeMetadata: true
+});`}
+          </CodeBlock>
+        </div>
+      )
+    },
+    {
+      id: "validation",
+      label: "Semantic Validation",
+      icon: Shield, 
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="warning" title="Query Pattern Detection">
+            <p className="text-xs mb-2">Dynamic regex patterns replace hardcoded keyword matching</p>
+          </HighlightBox>
+          
+          <div className="space-y-3">
+            {validationPatterns.map((pattern, index) => (
+              <div key={index} className="rounded-lg border p-3">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-sm">{pattern.name}</h4>
+                  <span className="text-xs bg-muted px-2 py-1 rounded">{pattern.result.split(' - ')[0]}</span>
+                </div>
+                <code className="text-xs bg-muted px-2 py-1 rounded block mb-1">{pattern.pattern}</code>
+                <p className="text-xs text-muted-foreground">{pattern.result}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -10,278 +174,110 @@ export function RagArchitectureSection() {
         </p>
       </div>
 
-      {/* System Overview */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">
-          System Overview
-        </h2>
-        <div className="rounded-lg border p-6 space-y-4">
-          <p>
-            The RAG system combines real-time vector search with large language model generation to provide accurate, 
-            context-aware responses about professional background, skills, and experience.
-          </p>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-md bg-muted p-4">
-              <h3 className="font-semibold mb-2">AI Model</h3>
-              <p className="text-sm text-muted-foreground">Groq AI (llama-3.1-8b-instant)</p>
-              <p className="text-xs text-muted-foreground mt-1">Fast inference, streaming support</p>
-            </div>
-            <div className="rounded-md bg-muted p-4">
-              <h3 className="font-semibold mb-2">Vector Database</h3>
-              <p className="text-sm text-muted-foreground">Upstash Vector</p>
-              <p className="text-xs text-muted-foreground mt-1">Serverless, low-latency semantic search</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <DocSection title="System Overview" icon={Database}>
+        <p className="text-sm text-muted-foreground mb-4">
+          The RAG system combines real-time vector search with large language model generation to provide accurate, 
+          context-aware responses about professional background, skills, and experience.
+        </p>
+        
+        <MetricGrid metrics={systemMetrics} columns={4} />
+      </DocSection>
 
-      {/* Architecture Flow */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">
-          Request Flow
-        </h2>
-        <div className="rounded-lg border p-6">
-          <ol className="space-y-4">
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                1
-              </span>
-              <div>
-                <h3 className="font-semibold">Query Preprocessing</h3>
-                <p className="text-sm text-muted-foreground">
-                  Typo correction, fuzzy matching, and query normalization for better search accuracy.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                2
-              </span>
-              <div>
-                <h3 className="font-semibold">Query Validation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Category detection (projects, skills, experience) and context validation to ensure professional relevance.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                3
-              </span>
-              <div>
-                <h3 className="font-semibold">Vector Search</h3>
-                <p className="text-sm text-muted-foreground">
-                  Semantic search in Upstash Vector with topK=2-3, minScore=0.75 (75% relevance threshold) with 0.65 fallback for top-2 results if no matches meet primary threshold.
-                </p>
-                <code className="text-xs bg-muted px-2 py-1 rounded mt-2 inline-block">
-                  const results = await vectorIndex.query(embedding, &#123; topK: 3, minScore: 0.75 &#125;)
-                </code>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                4
-              </span>
-              <div>
-                <h3 className="font-semibold">Context Building</h3>
-                <p className="text-sm text-muted-foreground">
-                  Retrieved chunks + conversation history + FAQ patterns combined into rich context prompt.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                5
-              </span>
-              <div>
-                <h3 className="font-semibold">AI Generation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Groq AI generates response with streaming, temperature-controlled based on mood (0.7 professional, 0.9 genz).
-                </p>
-              </div>
-            </li>
-          </ol>
-        </div>
-      </section>
+      <DocSection title="Request Flow" icon={Zap}>
+        <CodeBlock title="Complete Pipeline">
+          <StepList steps={architectureFlow} />
+        </CodeBlock>
+      </DocSection>
 
-      {/* Vector Database */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">
-          Vector Database Structure
-        </h2>
-        <div className="space-y-4">
-          <div className="rounded-lg border p-6">
-            <h3 className="font-semibold mb-3">Knowledge Base Organization</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">38 Embedded Chunks</p>
-                  <p className="text-muted-foreground">Professional profile data split into semantic chunks from digitaltwin.json</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">STAR Methodology</p>
-                  <p className="text-muted-foreground">Achievements structured as Situation, Task, Action, Result for detailed context</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">Metadata Enrichment</p>
-                  <p className="text-muted-foreground">Categories, tags, and relevance scores for precise retrieval</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <DocSection title="Core Components">
+        <Tabs items={ragComponents} defaultTab="groq" />
+      </DocSection>
 
-          <div className="rounded-lg border p-6">
-            <h3 className="font-semibold mb-3">Search Configuration</h3>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Top-K Results</p>
-                <p className="text-lg font-semibold">3 chunks</p>
-                <p className="text-xs text-muted-foreground">Most relevant contexts</p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Min Score Threshold</p>
-                <p className="text-lg font-semibold">0.75 (75%)</p>
-                <p className="text-xs text-muted-foreground">Primary threshold, 0.65 fallback</p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Average Score</p>
-                <p className="text-lg font-semibold">~80%</p>
-                <p className="text-xs text-muted-foreground">Typical relevance</p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Response Time</p>
-                <p className="text-lg font-semibold">&lt;3s</p>
-                <p className="text-xs text-muted-foreground">End-to-end latency</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <DocSection title="Semantic Validation System" icon={Search}>
+        <p className="text-sm text-muted-foreground mb-4">
+          Advanced query validation replaces hardcoded keyword matching with intelligent pattern detection 
+          for context-sensitive error handling.
+        </p>
 
-      {/* Streaming Implementation */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">
-          Streaming Responses
-        </h2>
-        <div className="rounded-lg border p-6 space-y-4">
-          <p>
-            Real-time response streaming using Vercel AI SDK and Groq AI's streaming API for immediate user feedback.
-          </p>
-          <div className="rounded-md bg-muted p-4">
-            <code className="text-sm">
-              <pre className="overflow-x-auto">{`const result = streamText({
-  model: groq('llama-3.1-8b-instant'),
-  system: finalSystemPrompt,
-  messages,
-  temperature: moodConfig.temperature,
-  onFinish: async ({ text }) => {
-    // Save to session memory
-    await saveConversationHistory(sessionId, updatedHistory);
-  }
-});`}</pre>
-            </code>
-          </div>
-          <ul className="space-y-2 text-sm list-disc list-inside text-muted-foreground">
-            <li>Progressive loading states: "Thinking..." → "Processing..." → "Almost there...", with 12s timeout fallback</li>
-            <li>Progressive rendering with loading indicators</li>
-            <li>AbortController for clean request cancellation</li>
-            <li>Error boundaries for graceful degradation</li>
-          </ul>
-        </div>
-      </section>
+        <ComparisonGrid
+          before={{
+            title: "Before: Hardcoded Keywords",
+            items: [
+              "Static keyword lists",
+              "Binary valid/invalid responses", 
+              "No context awareness",
+              "Generic error messages",
+              "Brittle pattern matching"
+            ]
+          }}
+          after={{
+            title: "After: Semantic Validation",
+            items: [
+              "Dynamic regex patterns",
+              "6 distinct error types", 
+              "Context-aware responses",
+              "Persona-specific error handling",
+              "Robust semantic analysis"
+            ]
+          }}
+        />
 
-      {/* Performance Metrics */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">
-          Performance Optimization
-        </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground mb-1">Token Usage</p>
-            <p className="text-2xl font-bold">1k-2.5k</p>
-            <p className="text-xs text-green-600">↓From 1.5k-3k (optimized)</p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground mb-1">RAG Accuracy</p>
-            <p className="text-2xl font-bold">75%</p>
-            <p className="text-xs text-muted-foreground">Average relevance (threshold)</p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground mb-1">Cache Hit Rate</p>
-            <p className="text-2xl font-bold">Redis</p>
-            <p className="text-xs text-muted-foreground">Session persistence</p>
-          </div>
-        </div>
-      </section>
+        <CodeBlock title="Implementation" className="mt-4">
+{`// lib/query-validator.ts
+export function validateQuery(query: string): ValidationResult {
+  // Pattern-based validation with error type classification
+  if (MANIPULATION_PATTERNS.test(query)) return { errorType: 'manipulation' };
+  if (query.length < 10) return { errorType: 'too_short' };
+  if (UNRELATED_PATTERNS.test(query)) return { errorType: 'unrelated' };
+  
+  return { isValid: true };
+}
 
-      {/* External Resources */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">External Resources</h2>
+// Usage in API
+const validation = validateQuery(query);
+if (validation.errorType) {
+  return getPersonaResponse(validation.errorType, mood);
+}`}
+        </CodeBlock>
+      </DocSection>
+
+      <DocSection title="Performance & Accuracy" icon={CheckCircle}>
         <div className="grid md:grid-cols-2 gap-4">
-          <a
-            href="https://upstash.com/docs/vector/sdks/ts/getting-started"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
-          >
-            <div>
-              <p className="font-semibold flex items-center gap-2">
-                <Database className="w-4 h-4" />
-                Upstash Vector Documentation
-              </p>
-              <p className="text-sm text-muted-foreground">TypeScript SDK setup and usage</p>
-            </div>
-            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-          </a>
-
-          <a
-            href="https://upstash.com/docs/redis/overall/getstarted"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg border p-4 hover:border-primary transition-colors flex items-center justify-between group"
-          >
-            <div>
-              <p className="font-semibold flex items-center gap-2">
-                <Database className="w-4 h-4" />
-                Upstash Redis Documentation
-              </p>
-              <p className="text-sm text-muted-foreground">Session storage and caching setup</p>
-            </div>
-            <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-          </a>
+          <HighlightBox type="success" title="Search Accuracy">
+            <p className="text-xs">75% relevance threshold with 65% fallback ensures high-quality results</p>
+          </HighlightBox>
+          <HighlightBox type="success" title="Response Speed">
+            <p className="text-xs">Streaming responses with &lt;2s initial token delivery</p>
+          </HighlightBox>
+          <HighlightBox type="success" title="Context Quality">
+            <p className="text-xs">Dual storage system optimizes both AI context and user experience</p>
+          </HighlightBox>
+          <HighlightBox type="success" title="Error Handling">
+            <p className="text-xs">6 error types with persona-aware responses maintain consistency</p>
+          </HighlightBox>
         </div>
-      </section>
 
-      {/* Code Example */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Implementation Example</h2>
-        <div className="rounded-lg border p-6">
-          <pre className="text-sm overflow-x-auto"><code>{`// Vector search with Upstash
-const ragContext = await searchVectorContext(vectorIndex, enhancedQuery, {
-  topK: 3,
-  minScore: 0.75,
-  includeMetadata: true,
-});
-
-// Build context from retrieved chunks
-const contextInfo = buildContextPrompt(ragContext);
-
-// Generate AI response with context
-const result = streamText({
-  model: groq('llama-3.1-8b-instant'),
-  system: SYSTEM_PROMPT + conversationContext + contextInfo,
-  messages,
-  temperature: 0.7,
-});`}</code></pre>
-        </div>
-      </section>
+        <AlertBox type="info" title="Technical Specifications" className="mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div>
+              <p className="font-medium">Vector Dimensions</p>
+              <p>1536 (OpenAI embedding)</p>
+            </div>
+            <div>
+              <p className="font-medium">Search TopK</p>
+              <p>2-3 results</p>
+            </div>
+            <div>
+              <p className="font-medium">Min Score</p>
+              <p>0.75 (0.65 fallback)</p>
+            </div>
+            <div>
+              <p className="font-medium">Response TTL</p>
+              <p>1 hour (Redis)</p>
+            </div>
+          </div>
+        </AlertBox>
+      </DocSection>
     </div>
   );
 }

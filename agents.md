@@ -11,7 +11,7 @@ AI SETUP:
 - Use Groq AI (NOT OpenAI) - faster and more cost-effective
 - Model: llama-3.1-8b-instant for chat responses
 - Upstash Vector for semantic search with RAG
-- Upstash Redis for caching (optional)
+- Upstash Redis for caching 
 
 Documentations you must read:
 - Set up Upstash Vector DB: https://upstash.com/docs/vector/sdks/ts/getting-started

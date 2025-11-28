@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "update-vector": "tsx scripts/update-vector-db.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.29",

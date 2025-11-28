@@ -20,8 +20,8 @@ export function ChatFeaturesModal() {
     },
     {
       icon: Sparkles,
-      title: "Dual Personality Modes",
-      description: "Switch between Professional mode for formal responses and GenZ mode for casual, friendly conversations.",
+      title: "Persona-Aware System",
+      description: "Professional/GenZ modes with mood-aware error handling. Smart suggested questions adapt to conversation context.",
     },
     {
       icon: MessageSquare,
@@ -35,13 +35,13 @@ export function ChatFeaturesModal() {
     },
     {
       icon: Shield,
-      title: "Session Memory",
-      description: "Remembers conversation context with Upstash Redis for more natural, contextual responses.",
+      title: "Dual Storage System",
+      description: "Session memory (8 messages for AI context) + complete chat history (UI display). Auto-clears after 1 hour.",
     },
     {
       icon: Globe,
-      title: "Query Processing",
-      description: "Advanced query validation, preprocessing, and feedback detection ensure relevant, helpful responses.",
+      title: "Semantic Validation",
+      description: "Regex-pattern validation with suggestion whitelisting. Persona-aware error responses replace hardcoded messages.",
     },
   ];
 
@@ -52,6 +52,7 @@ export function ChatFeaturesModal() {
     "Provide information about my education and career goals",
     "Share insights about my work style and personality",
     "Switch between professional and casual conversation modes",
+    "Provide smart suggested questions with localStorage persistence",
   ];
 
   return (
@@ -141,10 +142,10 @@ export function ChatFeaturesModal() {
           <div className="p-3 rounded-lg bg-muted/50 border">
             <h3 className="font-semibold mb-2 text-sm">💡 Tips for Best Results</h3>
             <ul className="space-y-1 text-xs text-muted-foreground">
-              <li>• Ask specific questions about my skills, projects, or experience</li>
-              <li>• Try different personality modes for varied response styles</li>
-              <li>• Questions are processed with semantic search for accuracy</li>
-              <li>• Session memory helps maintain conversation context</li>
+              <li>• Use smart suggested questions for guided conversation flow</li>
+              <li>• Try personality modes - error messages adapt to selected mood</li>
+              <li>• Session memory maintains context, chat history shows full conversation</li>
+              <li>• Semantic validation improves query understanding and accuracy</li>
             </ul>
           </div>
         </div>

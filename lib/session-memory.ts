@@ -30,8 +30,9 @@ export interface SessionData {
   feedbackPreferences?: FeedbackPreferences; // NEW: User preferences learned from feedback
 }
 
-const MAX_HISTORY = 16; // Keep last 16 messages (8 exchanges) for robust context
+const MAX_SESSION_MEMORY = 8; // Keep last 8 messages for AI context (optimal token efficiency)
 const SESSION_TTL = 3600; // 1 hour TTL
+const CHAT_HISTORY_TTL = 3600; // 1 hour TTL for complete chat history (auto clear)
 
 /**
  * Generate session ID from browser fingerprint or create new one
@@ -42,6 +43,7 @@ export function generateSessionId(): string {
 
 /**
  * Save conversation history to Redis WITH feedback preferences
+ * Maintains both session memory (for AI context) and complete chat history (for persistence)
  */
 export async function saveConversationHistory(
   sessionId: string,
@@ -50,26 +52,39 @@ export async function saveConversationHistory(
   feedbackPreferences?: FeedbackPreferences
 ): Promise<void> {
   try {
-    // Keep only the last MAX_HISTORY messages
-    const trimmedMessages = messages.slice(-MAX_HISTORY);
+    // SESSION MEMORY: Keep only the last MAX_SESSION_MEMORY messages for AI context
+    const sessionMemory = messages.slice(-MAX_SESSION_MEMORY);
     
     const sessionData: SessionData = {
-      messages: trimmedMessages,
+      messages: sessionMemory,
       sessionId,
       createdAt: Date.now(),
       lastActive: Date.now(),
       mood,
-      feedbackPreferences, // Store user preferences
+      feedbackPreferences,
     };
 
-    // Save to Redis with TTL
+    // Save session memory (for AI context)
     await redis.setex(
       `chat_session:${sessionId}`,
       SESSION_TTL,
       JSON.stringify(sessionData)
     );
 
-    console.log(`[Session Memory] Saved ${trimmedMessages.length} messages for session ${sessionId}`);
+    // CHAT HISTORY: Save complete conversation history separately
+    await redis.setex(
+      `chat_history:${sessionId}`,
+      CHAT_HISTORY_TTL,
+      JSON.stringify({
+        messages: messages, // Complete history, no trimming
+        sessionId,
+        createdAt: Date.now(),
+        lastActive: Date.now()
+      })
+    );
+
+    console.log(`[Session Memory] Saved ${sessionMemory.length} messages for AI context`);
+    console.log(`[Chat History] Saved ${messages.length} complete messages`);
     if (feedbackPreferences) {
       console.log(`[Adaptive Feedback] Saved preferences:`, feedbackPreferences);
     }
@@ -80,7 +95,7 @@ export async function saveConversationHistory(
 }
 
 /**
- * Load conversation history from Redis
+ * Load session memory from Redis (for AI context)
  */
 export async function loadConversationHistory(
   sessionId: string
@@ -89,15 +104,38 @@ export async function loadConversationHistory(
     const sessionData = await redis.get<SessionData>(`chat_session:${sessionId}`);
     
     if (!sessionData) {
-      console.log(`[Session Memory] No history found for session ${sessionId}`);
+      console.log(`[Session Memory] No session memory found for ${sessionId}`);
       return [];
     }
 
-    console.log(`[Session Memory] Loaded ${sessionData.messages.length} messages for session ${sessionId}`);
+    console.log(`[Session Memory] Loaded ${sessionData.messages.length} messages for AI context`);
     
     return sessionData.messages;
   } catch (error) {
     console.error('[Session Memory] Failed to load:', error);
+    return [];
+  }
+}
+
+/**
+ * Load complete chat history from Redis (for history display)
+ */
+export async function loadChatHistory(
+  sessionId: string
+): Promise<SessionMessage[]> {
+  try {
+    const historyData = await redis.get<{messages: SessionMessage[]}>(`chat_history:${sessionId}`);
+    
+    if (!historyData) {
+      console.log(`[Chat History] No complete history found for ${sessionId}`);
+      return [];
+    }
+
+    console.log(`[Chat History] Loaded ${historyData.messages.length} complete messages`);
+    
+    return historyData.messages;
+  } catch (error) {
+    console.error('[Chat History] Failed to load:', error);
     return [];
   }
 }
@@ -121,12 +159,13 @@ export async function loadFeedbackPreferences(
 }
 
 /**
- * Clear session history
+ * Clear both session memory and chat history
  */
 export async function clearSessionHistory(sessionId: string): Promise<void> {
   try {
     await redis.del(`chat_session:${sessionId}`);
-    console.log(`[Session Memory] Cleared session ${sessionId}`);
+    await redis.del(`chat_history:${sessionId}`);
+    console.log(`[Session Memory] Cleared session memory and chat history for ${sessionId}`);
   } catch (error) {
     console.error('[Session Memory] Failed to clear:', error);
   }
@@ -149,33 +188,23 @@ export async function getSessionMood(sessionId: string): Promise<string> {
 }
 
 /**
- * Build context from conversation history
+ * Build context from session memory (not complete chat history)
+ * Optimized: Reduced verbose follow-up rules from ~120 tokens to ~40 tokens
  */
 export function buildConversationContext(messages: SessionMessage[]): string {
   if (messages.length === 0) return '';
 
-  // Get last 8 exchanges (16 messages) for robust context
-  const recentMessages = messages.slice(-MAX_HISTORY);
+  // Use session memory messages (already trimmed to MAX_SESSION_MEMORY)
+  const recentMessages = messages.slice(-MAX_SESSION_MEMORY);
   
-  let context = '\n\n=== CONVERSATION HISTORY ===\n';
+  let context = '\n\n=== HISTORY ===\n';
   
   recentMessages.forEach((msg) => {
-    const speaker = msg.role === 'user' ? 'User' : 'Assistant';
+    const speaker = msg.role === 'user' ? 'U' : 'A';
     context += `${speaker}: ${msg.content}\n`;
   });
   
-  context += '=== END HISTORY ===\n\n';
-  context += `FOLLOW-UP RULES:
-1. "it", "them", "that" = last thing YOU (Assistant) mentioned
-2. Look at most recent Assistant message for context
-3. For repeat questions: re-answer naturally with different wording
-4. NEVER say "as I mentioned" or "like I said before"
-5. Add complementary details or different emphasis when re-answering
-
-EXAMPLE:
-Assistant: "I built AI-Powered Portfolio, Person Search app, and Modern Portfolio. Want details?"
-User: "the tech stacks of it" → They want tech stacks of ALL THREE projects you just mentioned
-`;
+  context += '=== END ===\n\nFOLLOW-UPS: "it"/"them"/"that" = what YOU just said. Check last Assistant message.\n';
   
   return context;
 }

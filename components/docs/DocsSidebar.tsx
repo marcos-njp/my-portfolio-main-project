@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { FileText, Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, LucideIcon } from "lucide-react";
+import { FileText, Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, FileCode, Brain } from "lucide-react";
 
 const navigation = [
   { name: "Overview", href: "/docs", icon: FileText },
   { name: "RAG Architecture", href: "/docs?section=rag-architecture", icon: Cpu },
+  { name: "Lib Utilities", href: "/docs?section=lib-utilities", icon: FileCode },
+  { name: "Personality System", href: "/docs?section=personality-system", icon: Brain },
   { name: "Advanced Features", href: "/docs?section=advanced-features", icon: Zap },
   { name: "MCP Integration", href: "/docs?section=mcp-integration", icon: Plug },
   { name: "Testing & Evolution", href: "/docs?section=testing", icon: TestTube },

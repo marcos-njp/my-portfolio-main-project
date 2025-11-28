@@ -1,7 +1,9 @@
+// All sections are now in flat structure
 export { RagArchitectureSection } from "./RagArchitectureSection";
-export { AdvancedFeaturesSection } from "./AdvancedFeaturesSection";
-export { McpIntegrationSection } from "./McpIntegrationSection";
-export { TestingSection } from "./TestingSection";
-export { OperationsSection } from "./OperationsSection";
+export { PersonalitySystemSection } from "./PersonalitySystemSection";
 export { ProfileDataSection } from "./ProfileDataSection";
+export { LibUtilitiesSection } from "./LibUtilitiesSection";
+export { McpIntegrationSection } from "./McpIntegrationSection";
+export { OperationsSection } from "./OperationsSection";
+export { TestingSection } from "./TestingSection";
 export { GithubSection } from "./GithubSection";

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { loadConversationHistory } from '@/lib/session-memory';
+import { loadChatHistory } from '@/lib/session-memory';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Load messages from Redis
-    const messages = await loadConversationHistory(sessionId);
+    // Load complete chat history from Redis (not just session memory)
+    const messages = await loadChatHistory(sessionId);
 
     console.log(`[Chat History API] Loaded ${messages.length} messages for session ${sessionId}`);
 

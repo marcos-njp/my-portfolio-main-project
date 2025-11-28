@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Github, ExternalLink, Star, Code, Globe } from "lucide-react";
 
 export function GithubSection() {
@@ -297,12 +298,12 @@ export function GithubSection() {
               <Github className="w-4 h-4" />
               Follow on GitHub
             </a>
-            <a
+            <Link
               href="/#contact"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md border hover:bg-muted transition-colors text-sm"
             >
               Get in Touch
-            </a>
+            </Link>
           </div>
         </div>
       </section>

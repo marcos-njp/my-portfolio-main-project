@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Suspense } from "react";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
-import { MobileNav } from "@/components/docs/MobileNav";
+import { MobileNav } from "@/components/docs";
 
 export default function DocsLayout({
   children,

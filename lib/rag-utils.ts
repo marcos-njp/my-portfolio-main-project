@@ -233,3 +233,52 @@ export function rerankResults(
   // Sort by adjusted scores
   return reranked.sort((a, b) => b.score - a.score);
 }
+
+/**
+ * Validate if retrieved context actually answers the specific question
+ */
+export function validateContextRelevance(query: string, retrievedContext: string, ragScore: number): {
+  isRelevant: boolean;
+  reason: string;
+  confidence: number;
+} {
+  // If RAG score is too low, definitely not relevant
+  if (ragScore < 0.6) {
+    return {
+      isRelevant: false,
+      reason: 'Low semantic similarity score',
+      confidence: 0.9
+    };
+  }
+  
+  // Check for timeline questions - need time indicators
+  if (/how long|timeline|duration|time frame|hours|days|weeks|months/.test(query.toLowerCase())) {
+    const hasTimeInfo = /\b(?:\d+\s*(?:hours?|days?|weeks?|months?|years?)|took|spent|duration|timeline)\b/i.test(retrievedContext);
+    if (!hasTimeInfo) {
+      return {
+        isRelevant: false,
+        reason: 'Context lacks timeline information for timeline question',
+        confidence: 0.8
+      };
+    }
+  }
+  
+  // Check for metrics questions - need numbers
+  if (/how many|users|downloads|visits|metrics|stats|numbers/.test(query.toLowerCase())) {
+    const hasMetrics = /\b(?:\d+\s*(?:users?|visits?|downloads?|%|percent|million|thousand)|traffic|revenue|conversion)\b/i.test(retrievedContext);
+    if (!hasMetrics) {
+      return {
+        isRelevant: false,
+        reason: 'Context lacks metrics for metrics question',
+        confidence: 0.8
+      };
+    }
+  }
+  
+  // Context seems relevant
+  return {
+    isRelevant: true,
+    reason: 'Context appears to address the query',
+    confidence: Math.min(ragScore, 0.85)
+  };
+}

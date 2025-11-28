@@ -19,7 +19,7 @@ export const FAQ_PATTERNS: FAQPattern[] = [
     category: "introduction",
     question: "Tell me about yourself",
     keywords: ["about yourself", "introduce yourself", "who are you", "background", "tell me about"],
-    contextHint: "Focus on: personal profile (chunk_1), education (chunk_13), key projects (chunks 14-17), competition achievements (chunks 8-9)",
+    contextHint: "Focus on: personal profile (chunk_1), education (chunk_13), key projects (chunks 14-16, 22-23), competition achievements (chunks 8-9)",
     relevance_boost: 0.95
   },
   {
@@ -51,7 +51,7 @@ export const FAQ_PATTERNS: FAQPattern[] = [
     category: "projects",
     question: "Tell me about your projects",
     keywords: ["projects", "what have you built", "portfolio", "applications", "apps"],
-    contextHint: "Focus on: AI-Powered Portfolio (chunk_14), Person Search (chunk_15), Modern Portfolio (chunk_16), AI Agent Setup (chunk_22), Movie App (chunk_23)",
+    contextHint: "Focus on: AI-Powered Portfolio (chunk_14, chunk_7), Person Search (chunk_15, chunk_5), Modern Portfolio (chunk_16, chunk_6), AI Agent Setup (chunk_22), Movie App (chunk_23)",
     relevance_boost: 0.93
   },
   
@@ -132,6 +132,7 @@ export function findRelevantFAQPatterns(query: string, topK = 2): FAQPattern[] {
 
 /**
  * Build context hints string for system prompt
+ * Optimized: Reduced from ~40 tokens to ~15 tokens
  */
 export function buildContextHints(patterns: FAQPattern[]): string {
   if (patterns.length === 0) return '';

@@ -1,13 +1,15 @@
 import { createGroq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 import { Index } from '@upstash/vector';
-import { searchVectorContext, buildContextPrompt } from '@/lib/rag-utils';
+import { searchVectorContext, buildContextPrompt, validateContextRelevance } from '@/lib/rag-utils';
 import { preprocessQuery } from '@/lib/query-preprocessor';
 import { validateQuery, enhanceQuery } from '@/lib/query-validator';
 import { findRelevantFAQPatterns, buildContextHints } from '@/lib/interviewer-faqs';
 import { validateMoodCompliance } from '@/lib/response-validator';
 import { getResponseLengthInstruction } from '@/lib/response-manager';
-import { getMoodConfig, getPersonaResponse, type AIMood } from '@/lib/ai-moods';
+import { getMoodConfig, getPersonaResponse, getSmartFallbackResponse, type AIMood } from '@/lib/ai-moods';
+
+
 import { 
   saveConversationHistory, 
   loadConversationHistory,
@@ -66,6 +68,12 @@ CRITICAL RULES:
 5. Keep responses 2-4 sentences unless the question needs more detail
 6. Never give generic answers like "I can answer questions about..." - give the ACTUAL answer
 
+KNOWLEDGE LIMITATIONS - Be honest about what you don't know:
+- If asked about development timelines/hours: "I don't have the exact timeline documented, but I can tell you about the technologies and challenges"
+- If asked about specific metrics/user numbers: "I don't have usage statistics to share, but I can discuss the technical implementation"
+- If asked about private details: "I keep that information private, but I can share details about my professional work"
+- ALWAYS offer alternative information you DO have when saying you don't know something
+
 EXAMPLE OF FOLLOW-UPS:
 You: "I built AI-Powered Portfolio, Person Search, and Modern Portfolio. Want details?"
 User: "the tech stacks of it"
@@ -117,11 +125,12 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1];
     const userQuery = lastMessage.content;
 
-    // ========== LOAD SESSION HISTORY & FEEDBACK PREFERENCES ==========
+    // ========== LOAD SESSION MEMORY & FEEDBACK PREFERENCES ==========
+    // Load session memory (last 8 messages) for AI context - NOT complete chat history
     const sessionHistory = sessionId ? await loadConversationHistory(sessionId) : [];
     const conversationContext = buildConversationContext(sessionHistory);
     
-    // Load existing feedback preferences
+    // Load user's learned feedback preferences (e.g., "be more detailed", "shorter responses")
     let feedbackPreferences: FeedbackPreferences = sessionId 
       ? await loadFeedbackPreferences(sessionId) || { feedback: [] }
       : { feedback: [] };
@@ -140,15 +149,21 @@ export async function POST(req: Request) {
     const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
     const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
 
-    // ========== STEP 0.3: Validate Query (Filter Irrelevant/Inappropriate) ==========
+    // ========== STEP 0.3: Enhanced Query Validation (Off-topic + Professional + Knowledge Gaps) ==========
     const validation = validateQuery(cleanQuery);
     
     if (!validation.isValid && !isShortFollowUp && !isFollowUpResponse) {
-      console.log(`[Query Validation] Rejected: "${cleanQuery}" - Reason: ${validation.reason}`);
+      console.log(`[Query Validation] Rejected: "${cleanQuery}" - Type: ${validation.errorType || 'unknown'}, Specific: ${validation.specificType || 'none'}`);
+      
+      // Use persona-aware error response based on error type
+      const errorMessage = validation.errorType 
+        ? getPersonaResponse(validation.errorType, mood)
+        : validation.reason; // Fallback to generic reason
+      
       return new Response(
         JSON.stringify({ 
           error: 'invalid_query',
-          message: validation.reason
+          message: errorMessage
         }),
         {
           status: 400,
@@ -210,20 +225,28 @@ export async function POST(req: Request) {
       includeMetadata: true,
     });
 
-    // ========== STEP 3: Graceful Fallback - Prevent Fabrication ==========
+    // ========== STEP 3: Enhanced Graceful Fallback - Knowledge Gap Detection ==========
     // CRITICAL: Require minimum relevance to prevent making up information
     const hasGoodContext = ragContext.chunksUsed > 0 && ragContext.topScore >= 0.6;
     
-    if (!hasGoodContext && !isShortFollowUp && !isFollowUpResponse) {
-      console.log(`[Graceful Fallback] No relevant context (topScore: ${ragContext.topScore.toFixed(2)}, chunks: ${ragContext.chunksUsed}) for: "${cleanQuery}"`);
+    // Enhanced: Check if retrieved context actually answers the specific question
+    let contextRelevance = { isRelevant: true, reason: '', confidence: 1.0 };
+    if (hasGoodContext) {
+      const combinedContext = ragContext.relevantChunks.join(' ');
+      contextRelevance = validateContextRelevance(cleanQuery, combinedContext, ragContext.topScore);
+    }
+    
+    if ((!hasGoodContext || !contextRelevance.isRelevant) && !isShortFollowUp && !isFollowUpResponse) {
+      console.log(`[Smart Fallback] Insufficient context for: "${cleanQuery}"`);
+      console.log(`[Smart Fallback] RAG Score: ${ragContext.topScore.toFixed(2)}, Chunks: ${ragContext.chunksUsed}, Context Relevant: ${contextRelevance.isRelevant}`);
       
-      // Use persona-aware fallback
-      const rejectionMessage = getPersonaResponse('no_context', mood);
+      // Use smart knowledge gap detection for better fallback messages
+      const smartFallback = getSmartFallbackResponse(cleanQuery, mood, ragContext.topScore);
       
       return new Response(
         JSON.stringify({ 
           error: 'insufficient_context',
-          message: rejectionMessage
+          message: smartFallback
         }),
         {
           status: 200,
@@ -232,13 +255,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Build context prompt
+    // Build context prompt from vector search results
+    // Optimized: Removed verbose warnings to reduce token usage (~50 tokens saved)
     let contextInfo = '';
     
-    // Add vector search context if we have good results
     if (ragContext.chunksUsed > 0) {
       contextInfo += buildContextPrompt(ragContext);
-      contextInfo += '\n\n⚠️ CRITICAL: Only use information from the CONTEXT above. If the context doesn\'t contain the answer, say "I don\'t have that information in my knowledge base" - DO NOT make up or infer information.';
+      contextInfo += '\n\nOnly use info from CONTEXT. If not found, say "I don\'t have that info".';
     } else {
       // If no vector context found, rely on conversation history
       contextInfo += '\n\n⚠️ WARNING: No specific vector context found. You MUST NOT fabricate information. Only answer if you have relevant context from conversation history.';
@@ -259,7 +282,7 @@ export async function POST(req: Request) {
     // ========== STEP 4.5: Add Response Length Instruction (Soft Guidelines) ==========
     const lengthInstruction = getResponseLengthInstruction(); // Uses default constraints
     
-    // Build final prompt with mood instructions + FAQ hints + length guidelines
+    // Build final system prompt with mood-specific instructions
     const finalSystemPrompt = mood === 'genz'
       ? moodConfig.systemPromptAddition + '\n\n' +
         'REMINDER: You are in GenZ mode - use slang, emojis, and casual tone!\n\n' +
@@ -268,9 +291,8 @@ export async function POST(req: Request) {
         contextInfo +
         faqContextHints +
         feedbackInstruction +
-        lengthInstruction +
-        '\n\n🔥 FINAL REMINDER: This is GenZ mode - be casual, use slang, add emojis! 💯'
-      : moodConfig.systemPromptAddition + '\n\n' + 
+        lengthInstruction
+      : moodConfig.systemPromptAddition + '\n' + 
         SYSTEM_PROMPT + 
         conversationContext + 
         contextInfo +
@@ -299,6 +321,8 @@ export async function POST(req: Request) {
         console.log(`[Response] Generated in ${responseTime}ms, ${text.length} chars`);
         
         // ========== STEP 5: Validate Response Mood Compliance ==========
+        // Check if AI response matches requested mood (professional/genz)
+        // Ensures consistent user experience across conversation
         const moodValidation = validateMoodCompliance(text, mood);
         
         if (!moodValidation.compliant) {
@@ -328,7 +352,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('❌ Chat API error:', error);
     
-    // Log detailed error information
+    // Log detailed error information for debugging
+    // Helps identify API issues, rate limits, or configuration problems
     if (error instanceof Error) {
       console.error('Error name:', error.name);
       console.error('Error message:', error.message);
@@ -358,10 +383,13 @@ export async function POST(req: Request) {
       );
     }
     
+    // Use persona-aware error message
+    const genericErrorMessage = getPersonaResponse('error', mood || 'professional');
+    
     return new Response(
       JSON.stringify({ 
         error: 'Failed to generate response',
-        message: errorMessage,
+        message: `${genericErrorMessage} (${errorMessage})`,
         timestamp: new Date().toISOString()
       }),
       {

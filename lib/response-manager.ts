@@ -31,26 +31,10 @@ export function countWords(text: string): number {
 }
 
 /**
- * OPTIMIZED: Get response length instruction for system prompt
- * More natural, less restrictive
+ * Get response length instruction for system prompt
  */
 export function getResponseLengthInstruction(constraints: LengthConstraints = DEFAULT_CONSTRAINTS): string {
-  return `
-RESPONSE LENGTH GUIDELINES:
-- Keep responses FOCUSED and HELPFUL (2-4 sentences for simple questions)
-- For complex questions: 4-6 sentences, use bullet points if listing items
-- If topic needs more detail, provide a good summary first
-- Aim for ~40-80 words for clarity without being wordy
-- Use specific examples, numbers, and tech names to be informative while staying concise
-
-EXAMPLES:
-Q: "What programming languages do you know?"
-A: "I'm proficient in JavaScript and TypeScript (Advanced, 2 years) and Python (Intermediate, 5 years). I mainly use JS/TS for web development with Next.js and React, while Python was my robotics competition language."
-
-Q: "Tell me about your projects"
-A: "I've built three main projects: 1) AI-powered portfolio with RAG system (Groq AI + Upstash Vector), 2) Person Search app (OAuth, Prisma, PostgreSQL), 3) Modern portfolio (Next.js 15, animations). All deployed on Vercel. Want details on any specific one?"
-
-QUALITY OVER LENGTH: Be helpful and complete, not just short.`;
+  return `\nLENGTH: 2-4 sentences (simple Q), 4-6 sentences (complex Q). Use bullet points for lists. Be specific (names, tech, numbers). Quality > length.`;
 }
 
 /**
@@ -94,7 +78,7 @@ export function shouldManageLength(response: string, constraints: LengthConstrai
 /**
  * Add helpful follow-up suggestion based on topic
  */
-export function addFollowUpPrompt(response: string, queryContext: string): string {
+export function addFollowUpPrompt(response: string, _queryContext: string): string {
   const wordCount = countWords(response);
   
   // Only add for longer responses

@@ -3,112 +3,45 @@
  * Uses expanded dictionary + Levenshtein distance for smart corrections
  */
 
-// EXPANDED: Comprehensive typo mappings
-const TYPO_CORRECTIONS: Record<string, string> = {
-  // Question words
-  'wat': 'what', 'wut': 'what', 'wht': 'what', 'waht': 'what',
-  'hw': 'how', 'hwo': 'how',
-  'wen': 'when', 'whn': 'when',
-  'wer': 'where',
-  'wy': 'why', 'wyh': 'why',
-  'woh': 'who', 'wo': 'who',
-  
-  // Common verbs
-  'cna': 'can', 'cann': 'can',
-  'tel': 'tell', 'tlel': 'tell', 'tll': 'tell',
-  'discribe': 'describe', 'descripe': 'describe', 'desribe': 'describe',
-  'explane': 'explain', 'explian': 'explain', 'expain': 'explain',
-  
-  // Professional terms
-  'experiance': 'experience', 'experince': 'experience', 'expereince': 'experience',
-  'skilss': 'skills', 'skils': 'skills', 'skiils': 'skills',
-  'projets': 'projects', 'projetcs': 'projects', 'porjects': 'projects',
-  'programing': 'programming', 'programmin': 'programming', 'progamming': 'programming',
-  'developement': 'development', 'devlopment': 'development', 'develpoment': 'development',
-  'achivements': 'achievements', 'achievments': 'achievements', 'achivment': 'achievement',
-  'educaton': 'education', 'educaiton': 'education', 'educaion': 'education',
-  'tecnical': 'technical', 'techincal': 'technical', 'technincal': 'technical', 'techncal': 'technical',
-  'compnay': 'company', 'comapny': 'company', 'companey': 'company',
-  'bacground': 'background', 'backgorund': 'background', 'bakground': 'background',
-  'interivew': 'interview', 'interveiw': 'interview', 'intervew': 'interview',
-  'certifcate': 'certificate', 'certficate': 'certificate', 'certificat': 'certificate',
-  'unversity': 'university', 'universtiy': 'university', 'univeristy': 'university',
-  'gradute': 'graduate', 'graduete': 'graduate', 'graduat': 'graduate',
-  'responsibilty': 'responsibility', 'responsibilites': 'responsibilities',
-  
-  // Tech terms
-  'langauges': 'languages', 'languges': 'languages', 'langages': 'languages',
-  'framworks': 'frameworks', 'framewroks': 'frameworks', 'framewoks': 'frameworks',
-  'databse': 'database', 'databses': 'databases', 'databae': 'database',
-  
-  // Common words
-  'abotu': 'about', 'abot': 'about', 'abuot': 'about', 'bout': 'about',
-  'youself': 'yourself', 'urself': 'yourself', 'yurself': 'yourself',
-  'yur': 'your', 'yor': 'your', 'yuor': 'your', 'ur': 'your',
-  'thier': 'their', 'ther': 'their', 'thir': 'their',
-  'teh': 'the', 'hte': 'the', 'te': 'the',
-  'taht': 'that', 'tht': 'that', 'thta': 'that',
-  'wich': 'which', 'whcih': 'which', 'wihch': 'which',
-  'strenth': 'strength', 'stregth': 'strength', 'strengh': 'strength',
-  'weekness': 'weakness', 'weaknes': 'weakness',
-  'challange': 'challenge', 'chalenge': 'challenge', 'chalelnge': 'challenge',
+// Smart typo corrections - focus on most common patterns
+const COMMON_TYPOS: Record<string, string> = {
+  // Question words (most frequent)
+  'wat': 'what', 'wut': 'what', 'hw': 'how', 'wy': 'why',
+  // Text speak
+  'ur': 'your', 'u': 'you', 'r': 'are', 'n': 'and',
+  // Common professional terms
+  'experiance': 'experience', 'skilss': 'skills', 'projets': 'projects',
+  'programing': 'programming', 'developement': 'development', 'educaton': 'education',
+  'abotu': 'about', 'teh': 'the', 'taht': 'that', 'wich': 'which'
 };
 
-// EXPANDED: Phrase corrections (higher priority)
-const PHRASE_CORRECTIONS: Record<string, string> = {
-  'tell me abot': 'tell me about',
-  'tel me about': 'tell me about',
-  'wat can you': 'what can you',
-  'wat do you': 'what do you',
-  'wat are you': 'what are you',
-  'can u': 'can you',
-  'cna you': 'can you',
-  'could u': 'could you',
-  'wats your': "what's your",
-  'whats ur': "what's your",
-  'wat is': 'what is',
-  'wat are': 'what are',
-  'wut is': 'what is',
-  'wut are': 'what are',
-  'hw many': 'how many',
-  'hw much': 'how much',
-  'discribe urself': 'describe yourself',
-  'descibe yourself': 'describe yourself',
-  'tel me ur': 'tell me your',
-  'ur skills': 'your skills',
-  'ur experience': 'your experience',
-  'ur background': 'your background',
-  'ur projects': 'your projects',
-  'do u have': 'do you have',
-  'have u': 'have you',
-  'are u': 'are you',
-  'were u': 'were you',
-  'did u': 'did you',
-  'r u': 'are you',
-};
+// Smart pattern-based corrections
+const TEXT_SPEAK_PATTERNS = [
+  { pattern: /\b(can|could|do|are|were|did)\s+u\b/gi, replace: '$1 you' },
+  { pattern: /\bur\s+(skills|experience|background|projects)/gi, replace: 'your $1' },
+  { pattern: /\b(wat|wut)\s+(can|do|are|is)/gi, replace: 'what $2' },
+  { pattern: /\bhw\s+(many|much)/gi, replace: 'how $1' },
+  { pattern: /\br\s+u\b/gi, replace: 'are you' }
+];
 
 /**
- * Fix common typos using dictionary
+ * Smart typo correction using patterns and common fixes
  */
 export function fixTypos(query: string): string {
   let corrected = query.toLowerCase();
   
-  // Fix phrases first (higher priority)
-  for (const [typo, correction] of Object.entries(PHRASE_CORRECTIONS)) {
-    const regex = new RegExp(`\\b${typo}\\b`, 'gi');
-    corrected = corrected.replace(regex, correction);
+  // Apply text speak patterns
+  for (const { pattern, replace } of TEXT_SPEAK_PATTERNS) {
+    corrected = corrected.replace(pattern, replace);
   }
   
-  // Fix individual words
+  // Fix common individual words
   const words = corrected.split(/\s+/);
   const fixedWords = words.map(word => {
     const cleanWord = word.replace(/[.,!?;:]$/, '');
     const punctuation = word.slice(cleanWord.length);
     
-    if (TYPO_CORRECTIONS[cleanWord]) {
-      return TYPO_CORRECTIONS[cleanWord] + punctuation;
-    }
-    return word;
+    return (COMMON_TYPOS[cleanWord] || cleanWord) + punctuation;
   });
   
   return fixedWords.join(' ');
@@ -159,51 +92,30 @@ function levenshteinDistance(str1: string, str2: string): number {
 }
 
 /**
- * SMART: Fuzzy correct professional terms using Levenshtein distance
- * Only corrects if word is close enough to known professional terms
+ * Smart correction for key professional terms only
  */
-export function fuzzyCorrectProfessionalTerms(query: string): string {
-  // Professional terms specific to Niño's domain
-  const professionalTerms = [
-    'programming', 'developer', 'software', 'engineer', 'frontend', 'backend',
-    'fullstack', 'database', 'framework', 'experience', 'projects', 'skills',
-    'education', 'university', 'graduate', 'achievements', 'technical',
-    'javascript', 'typescript', 'python', 'react', 'nextjs', 'portfolio',
-    'interview', 'company', 'salary', 'remote', 'internship', 'position',
-    'oauth', 'prisma', 'postgresql', 'groq', 'upstash', 'vector', 'vercel',
-    'tailwind', 'framer', 'motion', 'laravel', 'deployment', 'authentication',
-  ];
+export function correctKeyTerms(query: string): string {
+  // Focus on most commonly misspelled professional terms
+  const keyTerms = {
+    'programming': ['programing', 'programmin', 'progamming'],
+    'experience': ['experiance', 'experince', 'expereince'],
+    'development': ['developement', 'devlopment', 'develpoment'],
+    'projects': ['projets', 'projetcs', 'porjects'],
+    'skills': ['skilss', 'skils', 'skiils'],
+    'technical': ['tecnical', 'techincal', 'technincal'],
+    'education': ['educaton', 'educaiton', 'educaion'],
+    'university': ['unversity', 'universtiy', 'univeristy']
+  };
   
-  const words = query.toLowerCase().split(/\s+/);
-  const correctedWords = words.map(word => {
-    const cleanWord = word.replace(/[.,!?;:]$/, '');
-    const punctuation = word.slice(cleanWord.length);
-    
-    // Skip short words (likely correct)
-    if (cleanWord.length < 4) return word;
-    
-    // Skip if already in dictionary
-    if (professionalTerms.includes(cleanWord)) return word;
-    
-    // Find closest professional term
-    let bestMatch = cleanWord;
-    let minDistance = Infinity;
-    
-    for (const term of professionalTerms) {
-      const distance = levenshteinDistance(cleanWord, term);
-      // Threshold: max 30% difference OR max 2 chars for short words
-      const threshold = Math.min(3, Math.max(2, Math.floor(term.length * 0.3)));
-      
-      if (distance < minDistance && distance <= threshold) {
-        minDistance = distance;
-        bestMatch = term;
-      }
+  let corrected = query;
+  for (const [correct, misspellings] of Object.entries(keyTerms)) {
+    for (const misspelling of misspellings) {
+      const regex = new RegExp(`\\b${misspelling}\\b`, 'gi');
+      corrected = corrected.replace(regex, correct);
     }
-    
-    return bestMatch + punctuation;
-  });
+  }
   
-  return correctedWords.join(' ');
+  return corrected;
 }
 
 /**
@@ -223,11 +135,11 @@ export function preprocessQuery(query: string): { original: string; corrected: s
     processed = afterTypoFix;
   }
   
-  // Step 3: Fuzzy correct professional terms (Levenshtein)
-  const afterFuzzyFix = fuzzyCorrectProfessionalTerms(processed);
-  if (afterFuzzyFix !== processed) {
+  // Step 3: Correct key professional terms
+  const afterTermCorrection = correctKeyTerms(processed);
+  if (afterTermCorrection !== processed) {
     changes.push('Corrected professional terminology');
-    processed = afterFuzzyFix;
+    processed = afterTermCorrection;
   }
   
   return {

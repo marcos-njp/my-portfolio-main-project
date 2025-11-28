@@ -1,5 +1,11 @@
-import { AlertCircle, GitCommit, Wrench, CheckCircle, AlertTriangle, Code } from "lucide-react";
-import { TroubleshootCard, InfoBox, CodeBlock } from "@/components/docs";
+import { CheckCircle, AlertTriangle, Zap } from "lucide-react";
+import { 
+  DocSection, 
+  AlertBox, 
+  CodeBlock,
+  HighlightBox 
+} from "@/components/docs/common";
+import { TroubleshootCard } from "@/components/docs";
 
 export function OperationsSection() {
   return (
@@ -11,24 +17,21 @@ export function OperationsSection() {
         </p>
       </div>
 
-      {/* Overview */}
-      <section>
-        <InfoBox variant="muted">
-          <p>
-            This operations guide captures actual troubleshooting scenarios encountered during development. 
-            Each issue includes context, diagnosis, solution, and prevention strategies derived from 
-            commit messages and pull requests in the{" "}
-            <a 
-              href="https://github.com/marcos-njp/my-portfolio-main-project/commits/main/" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              project repository
-            </a>.
-          </p>
-        </InfoBox>
-      </section>
+      <AlertBox type="info" title="Operations Guide Overview">
+        <p>
+          This operations guide captures actual troubleshooting scenarios encountered during development. 
+          Each issue includes context, diagnosis, solution, and prevention strategies derived from 
+          commit messages and pull requests in the{" "}
+          <a 
+            href="https://github.com/marcos-njp/my-portfolio-main-project/commits/main/" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            project repository
+          </a>.
+        </p>
+      </AlertBox>
 
       {/* MCP Connectivity */}
       <section>
@@ -158,7 +161,7 @@ AI: "I can answer questions about my projects..." ❌ Generic response`}</CodeBl
                   <strong>Context Priority:</strong> Check conversation history BEFORE RAG retrieval
                 </li>
                 <li>
-                  <strong>Redis Persistence:</strong> Maintain 16 messages (8 exchanges) for context
+                  <strong>Dual Storage:</strong> Session memory (8 messages) + Complete history (all messages), 1h TTL
                 </li>
               </ol>
               <div className="mt-3">

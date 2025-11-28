@@ -13,6 +13,7 @@ export interface UserFeedback {
 export interface FeedbackPreferences {
   responseLength?: 'shorter' | 'longer' | 'default';
   detailLevel?: 'more_specific' | 'high_level' | 'default';
+  tone?: 'more_humble' | 'less_boastful' | 'more_confident' | 'default';
   examples?: number; // Number of examples to include
   feedback: UserFeedback[];
 }
@@ -26,6 +27,10 @@ const VALID_FEEDBACK_PATTERNS = {
   detail: {
     more_specific: /(?:more specific|be more detailed|give examples|can you elaborate|explain more|what do you mean)/i,
     high_level: /(?:high level|overview|summary|just the basics|simplified)/i,
+  },
+  tone: {
+    humble: /(?:you sounded? (?:too )?boastful|(?:too )?arrogant|(?:be )?more humble|(?:be )?less cocky|(?:sound )?(?:less )?overconfident|(?:don't )?brag)/i,
+    confident: /(?:too humble|more confident|don't undersell|sell yourself better)/i,
   },
 };
 
@@ -45,7 +50,7 @@ export function detectFeedback(message: string): UserFeedback | null {
   
   // Check for INVALID patterns first (reject these)
   for (const pattern of INVALID_PATTERNS) {
-    if (pattern.test(message)) {
+    if (pattern.test(lowerMessage)) {
       return {
         type: 'invalid',
         instruction: message,
@@ -93,6 +98,25 @@ export function detectFeedback(message: string): UserFeedback | null {
     };
   }
   
+  // Check for valid TONE feedback
+  if (VALID_FEEDBACK_PATTERNS.tone.humble.test(message)) {
+    return {
+      type: 'tone',
+      instruction: 'Be more humble and less boastful in responses',
+      isProfessional: true,
+      timestamp: Date.now(),
+    };
+  }
+  
+  if (VALID_FEEDBACK_PATTERNS.tone.confident.test(message)) {
+    return {
+      type: 'tone',
+      instruction: 'Be more confident and assertive about achievements',
+      isProfessional: true,
+      timestamp: Date.now(),
+    };
+  }
+  
   return null; // No feedback detected
 }
 
@@ -132,6 +156,14 @@ export function applyFeedback(
     }
   }
   
+  if (feedback.type === 'tone') {
+    if (feedback.instruction.includes('humble') || feedback.instruction.includes('boastful')) {
+      newPreferences.tone = 'more_humble';
+    } else if (feedback.instruction.includes('confident')) {
+      newPreferences.tone = 'more_confident';
+    }
+  }
+  
   // Track feedback
   newPreferences.feedback = [...currentPreferences.feedback, feedback].slice(-5); // Keep last 5
   
@@ -140,14 +172,15 @@ export function applyFeedback(
 
 /**
  * Build instruction string from preferences
+ * Optimized: Reduced from ~80 tokens to ~30 tokens
  */
 export function buildFeedbackInstruction(preferences: FeedbackPreferences): string {
   const instructions: string[] = [];
   
   if (preferences.responseLength === 'shorter') {
-    instructions.push('USER PREFERENCE: Keep responses SHORT (1-2 sentences max unless question is complex)');
+    instructions.push('User wants: SHORT (1-2 sentences)');
   } else if (preferences.responseLength === 'longer') {
-    instructions.push('USER PREFERENCE: Provide MORE DETAILED responses with comprehensive explanations');
+    instructions.push('User wants: MORE DETAIL');
   }
   
   if (preferences.detailLevel === 'more_specific') {
@@ -156,9 +189,13 @@ export function buildFeedbackInstruction(preferences: FeedbackPreferences): stri
     instructions.push('USER PREFERENCE: High-level overview only - skip granular details');
   }
   
-  if (instructions.length === 0) {
-    return ''; // No active preferences
+  if (preferences.tone === 'more_humble') {
+    instructions.push('USER FEEDBACK: BE MORE HUMBLE - avoid boastful language, use "I learned" not "I mastered", acknowledge growth areas');
+  } else if (preferences.tone === 'more_confident') {
+    instructions.push('USER FEEDBACK: BE MORE CONFIDENT - highlight achievements clearly, don\'t undersell yourself');
   }
+  
+  if (instructions.length === 0) return '';
   
   return '\n\n🎯 ADAPTIVE FEEDBACK (Learn from user\'s preferences):\n' + 
     instructions.join('\n') + 

@@ -3,15 +3,16 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
-import { Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, ArrowRight } from "lucide-react";
+import { Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, ArrowRight, FileCode } from "lucide-react";
 import {
   RagArchitectureSection,
-  AdvancedFeaturesSection,
   McpIntegrationSection,
   TestingSection,
   OperationsSection,
   ProfileDataSection,
   GithubSection,
+  LibUtilitiesSection,
+  PersonalitySystemSection,
 } from "@/components/docs/sections";
 
 const sections = [
@@ -22,10 +23,22 @@ const sections = [
     description: "Deep dive into the RAG system: Groq AI integration, Upstash Vector database, semantic search, and streaming responses.",
   },
   {
+    title: "Lib Utilities",
+    href: "/docs?section=lib-utilities",
+    icon: FileCode,
+    description: "Complete guide to all utility modules: persona-aware error handling, dual storage system, semantic validation, and smart processing.",
+  },
+  {
+    title: "Personality System",
+    href: "/docs?section=personality-system",
+    icon: Database,
+    description: "Mood-aware error responses, personality consistency, and 6-type error handling system for professional/GenZ modes.",
+  },
+  {
     title: "Advanced Features",
-    href: "/docs?section=advanced-features",
+    href: "/docs?section=personality-system",
     icon: Zap,
-    description: "Personality modes, session memory, query preprocessing, feedback detection, and response optimization.",
+    description: "Dual storage system, persona-aware errors, smart suggestions, semantic validation, and enhanced chat experience."
   },
   {
     title: "MCP Integration",
@@ -71,8 +84,12 @@ export default function DocsContent() {
     switch (section) {
       case "rag-architecture":
         return <RagArchitectureSection />;
+      case "lib-utilities":
+        return <LibUtilitiesSection />;
+      case "personality-system":
+        return <PersonalitySystemSection />;
       case "advanced-features":
-        return <AdvancedFeaturesSection />;
+        return <LibUtilitiesSection />;
       case "mcp-integration":
         return <McpIntegrationSection />;
       case "testing":
@@ -97,9 +114,9 @@ export default function DocsContent() {
               <h2 className="text-lg font-semibold mb-2">About This Portfolio</h2>
               <p className="text-sm text-muted-foreground mb-4">
                 This is a production-ready Next.js 15 portfolio featuring an AI digital twin powered by Retrieval-Augmented Generation (RAG). 
-                The system uses Groq AI with the llama-3.1-8b-instant model and Upstash Vector for semantic search, enabling real-time responses 
-                to professional queries with high accuracy. Recent enhancements include improved chat UX with transparency disclaimers, 
-                timeout protection, and always-visible question suggestions for better user guidance.
+                The system uses Groq AI with llama-3.1-8b-instant and Upstash Vector for semantic search. Latest improvements include 
+                persona-aware error handling, dual storage system (session memory + complete chat history), smart suggested questions 
+                with persistence, and semantic query validation patterns for enhanced user experience.
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
@@ -124,11 +141,11 @@ export default function DocsContent() {
             <div>
               <h2 className="text-2xl font-semibold mb-4">Explore Documentation</h2>
               <div className="grid gap-4 md:grid-cols-2">
-                {sections.map((section) => {
+                {sections.map((section, index) => {
                   const Icon = section.icon;
                   return (
                     <Link
-                      key={section.href}
+                      key={`${section.title}-${index}`}
                       href={section.href}
                       className="group relative rounded-lg border p-6 hover:border-primary transition-colors"
                     >
