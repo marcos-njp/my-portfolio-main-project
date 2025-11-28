@@ -1,108 +1,135 @@
-import { Sparkles, Zap, Brain, Database, Shield, Settings } from "lucide-react";
+import { Zap, Database, Shield, Brain, Sparkles, Settings, Users } from "lucide-react";
 import { 
   DocSection, 
   AlertBox, 
-  ComparisonGrid, 
-  StepList, 
-  CodeBlock,
   MetricGrid,
   HighlightBox,
-  Tabs 
+  CodeBlock,
+  Tabs,
+  ComparisonGrid
 } from "@/components/docs/common";
 
 export function AdvancedFeaturesSection() {
-  const advancedFeatures = [
+  const featureMetrics = [
+    { label: "Error Categories", value: "9", description: "Persona-aware responses" },
+    { label: "Storage Layers", value: "2", description: "AI + UI optimized" },
+    { label: "Validation Patterns", value: "12", description: "Semantic accuracy" },
+    { label: "Token Savings", value: "25%", description: "Optimized context" },
+    { label: "RAG Threshold", value: "0.75", description: "Balanced accuracy" },
+    { label: "Session TTL", value: "1h", description: "Auto cleanup" }
+  ];
+
+  const advancedTabs = [
     {
       id: "dual-storage",
-      label: "Dual Storage System",
+      label: "Dual Storage Architecture",
       icon: Database,
       content: (
         <div className="space-y-4">
-          <HighlightBox type="info" title="Optimized Memory Management">
-            <p className="text-xs mb-3">Separate storage strategies for AI context vs. UI display to optimize performance and user experience</p>
+          <HighlightBox type="info" title="Redis-Backed Dual Storage">
+            <p className="text-xs">Separate storage strategies optimize both AI performance (token efficiency) and user experience (complete history)</p>
           </HighlightBox>
 
           <ComparisonGrid
             before={{
-              title: "AI Context (Limited)",
+              title: "Session Memory (AI Context)",
               items: [
                 "Last 8 messages only",
-                "Optimized for token usage",
-                "Essential context preservation",
-                "Conversation flow continuity"
+                "chat_session:{sessionId} key",
+                "Optimized for token limits",
+                "Used by AI for context"
               ]
             }}
             after={{
-              title: "UI Display (Complete)",
+              title: "Chat History (UI Display)",
               items: [
-                "Full conversation history",
+                "Complete conversation",
+                "chat_history:{sessionId} key", 
                 "Rich formatting preserved",
-                "Copy functionality enabled", 
-                "Session persistence"
+                "Copy functionality enabled"
               ]
             }}
           />
 
           <CodeBlock title="Implementation">
-{`// lib/session-memory.ts
+{`// lib/session-memory.ts - Dual storage system
 export async function saveConversationHistory(
   sessionId: string, 
   messages: SessionMessage[],
-  mood: AIMood,
+  mood: string = 'professional',
   feedbackPreferences?: FeedbackPreferences
-) {
-  // AI Context: Keep only last 8 messages for token efficiency
-  const aiContext = messages.slice(-8);
+): Promise<void> {
+  // SESSION MEMORY: Last 8 messages for AI context (token efficiency)
+  const sessionMemory = messages.slice(-MAX_SESSION_MEMORY);
+  const sessionData = {
+    messages: sessionMemory,
+    sessionId, mood, feedbackPreferences,
+    createdAt: Date.now(), lastActive: Date.now()
+  };
   
-  // UI Display: Store complete history for user experience
-  const fullHistory = messages;
+  // Save session memory (for AI context)
+  await redis.setex(\`chat_session:\${sessionId}\`, SESSION_TTL, 
+    JSON.stringify(sessionData));
   
-  await redis.setex(\`session:\${sessionId}:ai\`, 3600, JSON.stringify(aiContext));
-  await redis.setex(\`session:\${sessionId}:ui\`, 3600, JSON.stringify(fullHistory));
+  // CHAT HISTORY: Complete conversation for UI display
+  await redis.setex(\`chat_history:\${sessionId}\`, CHAT_HISTORY_TTL, 
+    JSON.stringify({ messages: messages, sessionId, createdAt: Date.now() }));
 }`}
           </CodeBlock>
         </div>
       )
     },
     {
-      id: "persona-errors",
+      id: "persona-errors", 
       label: "Persona-Aware Error Handling",
       icon: Shield,
       content: (
         <div className="space-y-4">
-          <HighlightBox type="warning" title="6 Error Categories">
-            <p className="text-xs mb-3">Each error type gets customized responses based on personality mode (Professional vs GenZ)</p>
+          <HighlightBox type="warning" title="9 Error Categories with Dual Personalities">
+            <p className="text-xs">Each error type has both Professional and GenZ responses maintaining personality consistency</p>
           </HighlightBox>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium text-sm">Professional Mode</h4>
+              <h4 className="font-medium text-sm">Professional Responses</h4>
               <div className="space-y-1 text-xs">
-                <p><strong>unrelated:</strong> "I focus on professional topics..."</p>
-                <p><strong>too_short:</strong> "Could you provide more details..."</p>
-                <p><strong>manipulation:</strong> "I maintain professional boundaries..."</p>
-                <p><strong>rate_limit:</strong> "Please wait a moment..."</p>
+                <p><strong>unrelated:</strong> "I'm here to discuss Niño's professional background..."</p>
+                <p><strong>too_short:</strong> "Please ask a more specific question about my skills..."</p>
+                <p><strong>knowledge_gap:</strong> "I don't have that specific information documented..."</p>
+                <p><strong>tech_preferences:</strong> "I focus on discussing my professional development work..."</p>
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-sm">GenZ Mode</h4>
+              <h4 className="font-medium text-sm">GenZ Responses</h4>
               <div className="space-y-1 text-xs">
-                <p><strong>unrelated:</strong> "Yo, I'm here for career stuff..."</p>
-                <p><strong>too_short:</strong> "Need more context bestie..."</p>
-                <p><strong>manipulation:</strong> "Nice try but nah..."</p>
-                <p><strong>rate_limit:</strong> "Hold up, chill for a sec..."</p>
+                <p><strong>unrelated:</strong> "yo that's off topic 💀 let's talk about the portfolio stuff..."</p>
+                <p><strong>too_short:</strong> "bro that's too short 😭 gimme more details..."</p>
+                <p><strong>knowledge_gap:</strong> "yo don't have those exact deets 😅 but i can break down..."</p>
+                <p><strong>tech_preferences:</strong> "yo we keeping this about my dev work and projects fr 💻..."</p>
               </div>
             </div>
           </div>
 
           <CodeBlock title="Error Response System">
-{`// lib/ai-moods.ts
-export function getPersonaResponse(errorType: string, mood: AIMood): string {
-  const responses = ERROR_RESPONSES[errorType];
-  return mood === 'genz' ? responses.genz : responses.professional;
+{`// lib/ai-moods.ts - Persona-aware error handling
+export function getPersonaResponse(
+  type: 'no_context' | 'unrelated' | 'manipulation' | 'rate_limit' | 'error' | 
+        'too_short' | 'knowledge_gap' | 'tech_preferences' | 'entertainment' | 
+        'personal' | 'inappropriate',
+  mood: AIMood,
+  query?: string
+): string {
+  const responses = {
+    unrelated: {
+      professional: "I'm here to discuss Niño's professional background...",
+      genz: "yo that's off topic 💀 let's talk about the portfolio stuff...",
+    },
+    // 8 more error types with dual responses...
+  };
+  return responses[type][mood];
 }
 
-// Usage in API
+// Usage in API route
 if (validation.errorType) {
   const errorMessage = getPersonaResponse(validation.errorType, mood);
   return new Response(JSON.stringify({ error: errorMessage }));
@@ -112,54 +139,13 @@ if (validation.errorType) {
       )
     },
     {
-      id: "smart-suggestions",
-      label: "Smart Suggestions & Context",
-      icon: Sparkles,
-      content: (
-        <div className="space-y-4">
-          <HighlightBox type="success" title="Contextual Question Generation">
-            <p className="text-xs mb-3">AI generates relevant follow-up questions based on conversation history and user interests</p>
-          </HighlightBox>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <HighlightBox type="info" title="localStorage Persistence">
-              <p className="text-xs">Suggestions saved locally to prevent repetition across sessions</p>
-            </HighlightBox>
-            <HighlightBox type="info" title="Dynamic Updates">
-              <p className="text-xs">Questions adapt based on previous topics discussed</p>
-            </HighlightBox>
-          </div>
-
-          <CodeBlock title="Suggestion Logic">
-{`// Smart suggestion generation
-const generateSuggestions = (conversationHistory, userInterests) => {
-  const topics = extractTopics(conversationHistory);
-  const suggestions = [];
-  
-  // Avoid already discussed topics
-  const unusedTopics = QUESTION_BANK.filter(q => 
-    !topics.includes(q.category)
-  );
-  
-  // Generate contextual follow-ups
-  if (topics.includes('projects')) {
-    suggestions.push("What challenges did you face in development?");
-  }
-  
-  return suggestions.slice(0, 4); // Show 4 max
-};`}
-          </CodeBlock>
-        </div>
-      )
-    },
-    {
       id: "semantic-validation",
-      label: "Semantic Query Validation",
+      label: "Semantic Query Validation", 
       icon: Brain,
       content: (
         <div className="space-y-4">
-          <HighlightBox type="info" title="Pattern-Based Detection">
-            <p className="text-xs mb-3">Replaced hardcoded keywords with intelligent regex patterns for robust query classification</p>
+          <HighlightBox type="info" title="Pattern-Based Intelligence">
+            <p className="text-xs">Replaced hardcoded keyword lists with intelligent regex patterns for robust query classification and better maintainability</p>
           </HighlightBox>
 
           <ComparisonGrid
@@ -167,77 +153,213 @@ const generateSuggestions = (conversationHistory, userInterests) => {
               title: "Old: Keyword Matching",
               items: [
                 "Static word lists",
-                "Case-sensitive matching",
+                "Case-sensitive matching", 
                 "Binary valid/invalid",
-                "No context awareness"
+                "Difficult to maintain"
               ]
             }}
             after={{
               title: "New: Semantic Patterns",
               items: [
                 "Dynamic regex patterns",
-                "Fuzzy matching support",
-                "Confidence scoring",
-                "Context-sensitive validation"
+                "Context-aware validation",
+                "Confidence scoring (0-1)",
+                "Professional relevance detection"
               ]
             }}
           />
 
           <CodeBlock title="Validation Engine">
-{`// lib/query-validator.ts
+{`// lib/query-validator.ts - Semantic pattern validation
+const PROFESSIONAL_PATTERNS = {
+  technical: /\\b(?:code|coding|program|develop|software|web|app|api|database|tech|stack)\\b/i,
+  skills: /\\b(?:skill|knowledge|experience|proficiency|expertise|learn|familiar)\\b/i,
+  projects: /\\b(?:project|built|created|portfolio|deployed|application)\\b/i,
+  career: /\\b(?:work|job|career|interview|hire|position|role|responsibility)\\b/i,
+};
+
+const REJECTION_PATTERNS = {
+  personal: /\\b(?:girlfriend|boyfriend|dating|relationship|family|parents|address|phone|bank|password|salary|income)\\b/i,
+  tech_preferences: /\\b(?:prefer|like|choose|better)\\b.{0,20}\\b(?:mac|windows|linux|android|ios)\\b/i,
+  entertainment: /\\b(?:favorite|like|watch|listen).{0,20}\\b(?:movie|music|show|game|anime|netflix)\\b/i,
+};
+
 export function validateQuery(query: string): ValidationResult {
-  const confidence = calculateConfidence(query);
+  // Calculate professional relevance using semantic patterns
+  let professionalScore = 0;
+  let matchedCategories: string[] = [];
   
-  // Professional relevance patterns
-  if (PROFESSIONAL_PATTERNS.some(p => p.test(query))) {
-    return { isValid: true, confidence, category: 'professional' };
+  for (const [category, pattern] of Object.entries(PROFESSIONAL_PATTERNS)) {
+    if (pattern.test(queryLower)) {
+      professionalScore++;
+      matchedCategories.push(category);
+    }
   }
   
-  // Off-topic detection
-  if (OFF_TOPIC_PATTERNS.some(p => p.test(query))) {
-    return { isValid: false, errorType: 'unrelated', confidence };
-  }
+  // Calculate confidence based on pattern matches
+  let confidence = professionalScore >= 3 ? 0.95 : 
+                  professionalScore >= 2 ? 0.85 : 
+                  professionalScore >= 1 ? 0.75 : 0.65;
   
-  // Knowledge gap detection
-  if (confidence < 0.6) {
-    return { isValid: false, errorType: 'knowledge_gap', confidence };
-  }
-  
-  return { isValid: true, confidence };
+  return { isValid: confidence >= 0.65, confidence, category };
 }`}
           </CodeBlock>
         </div>
       )
+    },
+    {
+      id: "adaptive-feedback",
+      label: "Adaptive Feedback Learning",
+      icon: Users,
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="success" title="User Preference Learning">
+            <p className="text-xs">System learns from user feedback ('be more detailed', 'shorter responses') and applies preferences consistently throughout the session</p>
+          </HighlightBox>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <HighlightBox type="info" title="Length Adaptation">
+              <p className="text-xs">Detects "too long/short" feedback and adjusts response length</p>
+            </HighlightBox>
+            <HighlightBox type="info" title="Detail Control">
+              <p className="text-xs">Learns preference for specific examples vs high-level overviews</p>
+            </HighlightBox>
+            <HighlightBox type="info" title="Tone Adjustment">
+              <p className="text-xs">Adapts between humble and confident based on user feedback</p>
+            </HighlightBox>
+          </div>
+
+          <CodeBlock title="Feedback Detection & Learning">
+{`// lib/feedback-detector.ts - Adaptive learning system
+const VALID_FEEDBACK_PATTERNS = {
+  length: {
+    shorter: /(?:too long|make it shorter|be more concise|less wordy|keep it brief)/i,
+    longer: /(?:too short|more detail|elaborate|expand on|tell me more)/i,
+  },
+  detail: {
+    more_specific: /(?:more specific|be more detailed|give examples|can you elaborate)/i,
+    high_level: /(?:high level|overview|summary|just the basics|simplified)/i,
+  },
+  tone: {
+    humble: /(?:too boastful|too arrogant|be more humble|less cocky|don't brag)/i,
+    confident: /(?:too humble|more confident|don't undersell|sell yourself better)/i,
+  },
+};
+
+export function detectFeedback(message: string): UserFeedback | null {
+  // Check for valid feedback patterns and apply to session preferences
+  if (VALID_FEEDBACK_PATTERNS.length.shorter.test(message)) {
+    return {
+      type: 'length',
+      instruction: 'Keep responses shorter and more concise',
+      isProfessional: true,
+      timestamp: Date.now(),
+    };
+  }
+  // ... more pattern detection
+}
+
+export function buildFeedbackInstruction(preferences: FeedbackPreferences): string {
+  const instructions: string[] = [];
+  
+  if (preferences.responseLength === 'shorter') {
+    instructions.push('User wants: SHORT (1-2 sentences)');
+  }
+  
+  if (preferences.detailLevel === 'more_specific') {
+    instructions.push(\`USER PREFERENCE: Be SPECIFIC - include concrete examples\`);
+  }
+  
+  return instructions.length > 0 ? 
+    '\\n\\n🎯 ADAPTIVE FEEDBACK:\\n' + instructions.join('\\n') : '';
+}`}
+          </CodeBlock>
+        </div>
+      )
+    },
+    {
+      id: "rag-optimization",
+      label: "RAG Context Optimization",
+      icon: Sparkles,
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="info" title="Upstash Vector + Redis Integration">
+            <p className="text-xs">Semantic search with relevance threshold (0.75), context validation, and intelligent fallback strategies</p>
+          </HighlightBox>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Search Optimization</h4>
+              <div className="space-y-1 text-xs">
+                <p>• <strong>Relevance threshold:</strong> 0.75 for balanced accuracy</p>
+                <p>• <strong>Reranking:</strong> Boost technical/project matches</p>
+                <p>• <strong>Context validation:</strong> Verify answers match questions</p>
+                <p>• <strong>Smart fallbacks:</strong> Knowledge gap detection</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Context Assembly</h4>
+              <div className="space-y-1 text-xs">
+                <p>• <strong>Session memory:</strong> Last 8 messages for AI</p>
+                <p>• <strong>Vector results:</strong> Top 5 relevant chunks</p>
+                <p>• <strong>Feedback prefs:</strong> User learning applied</p>
+                <p>• <strong>Mood context:</strong> Personality-aware prompts</p>
+              </div>
+            </div>
+          </div>
+
+          <CodeBlock title="RAG Pipeline">
+{`// lib/rag-utils.ts - Enhanced RAG with validation
+export async function searchVectorContext(
+  vectorIndex: Index,
+  query: string,
+  options: { topK?: number; minScore?: number } = {}
+): Promise<RAGContext> {
+  const { topK = 5, minScore = 0.75 } = options;
+
+  const results = await vectorIndex.query({
+    data: query, topK, includeMetadata: true,
+  }) as VectorResult[];
+
+  // Filter by relevance threshold
+  const relevantResults = results.filter(result => result.score >= minScore);
+  
+  // If no results meet threshold, use top 2 if reasonably good (>0.65)
+  if (relevantResults.length === 0) {
+    const topResults = results.slice(0, 2).filter(r => r.score >= 0.65);
+    if (topResults.length > 0) {
+      return formatRAGContext(topResults);
     }
-  ];
+  }
+  
+  return formatRAGContext(relevantResults);
+}
 
-  const featureMetrics = [
-    { label: "Error Types", value: "6", description: "Persona-aware categories" },
-    { label: "Storage Layers", value: "2", description: "AI context + UI display" },
-    { label: "Validation Accuracy", value: "95%", description: "Semantic patterns" },
-    { label: "Context Retention", value: "8 msgs", description: "Optimized for AI" }
-  ];
-
-  const enhancementTimeline = [
-    {
-      title: "Enhanced Chat Experience",
-      description: "Copy functionality, feedback mechanisms, and persistent suggestions for better UX"
-    },
-    {
-      title: "Adaptive Feedback Learning",
-      description: "System learns user preferences ('be more detailed', 'shorter responses') and applies them consistently"
-    },
-    {
-      title: "Context Relevance Checking",
-      description: "Validates that RAG results actually answer user questions before generating responses"
-    },
-    {
-      title: "Smart Error Classification",
-      description: "6 distinct error types with persona-specific responses maintain conversation consistency"
-    },
-    {
-      title: "Performance Optimization",
-      description: "Token usage reduced ~25% while maintaining response quality and personality accuracy"
+// Context relevance validation
+export function validateContextRelevance(
+  query: string, 
+  retrievedContext: string, 
+  ragScore: number
+): { isRelevant: boolean; reason: string; confidence: number } {
+  
+  // Check for timeline questions - need time indicators
+  if (/how long|timeline|duration/.test(query.toLowerCase())) {
+    const hasTimeInfo = /\\b(?:\\d+\\s*(?:hours?|days?|weeks?|months?)|took|spent)\\b/i
+      .test(retrievedContext);
+    if (!hasTimeInfo) {
+      return {
+        isRelevant: false,
+        reason: 'Context lacks timeline information for timeline question',
+        confidence: 0.8
+      };
+    }
+  }
+  
+  return { isRelevant: true, reason: 'Context appears relevant', confidence: ragScore };
+}`}
+          </CodeBlock>
+        </div>
+      )
     }
   ];
 
@@ -246,76 +368,34 @@ export function validateQuery(query: string): ValidationResult {
       <div>
         <h1 className="text-4xl font-bold tracking-tight mb-3">Advanced Features</h1>
         <p className="text-xl text-muted-foreground">
-          Dual storage system, persona-aware errors, smart suggestions, semantic validation, and enhanced chat experience powering the AI digital twin.
+          Dual storage system, persona-aware errors, semantic validation, adaptive learning, and RAG optimization powering the AI digital twin.
         </p>
       </div>
 
-      <AlertBox type="info" icon={Zap} title="Feature Overview">
-        <p>
-          These advanced features work together to create a sophisticated AI interaction system that feels natural, 
-          maintains consistency, and provides intelligent responses while optimizing for both performance and user experience.
-        </p>
+      <AlertBox type="info" icon={Zap} title="Intelligent AI System">
+        <p>Advanced features working together to create sophisticated AI interactions that feel natural, maintain consistency, and continuously improve based on user feedback while optimizing for both performance and user experience.</p>
       </AlertBox>
 
       <DocSection title="System Metrics" icon={Settings}>
-        <MetricGrid metrics={featureMetrics} columns={4} />
+        <MetricGrid metrics={featureMetrics} columns={3} />
       </DocSection>
 
       <DocSection title="Core Features" icon={Sparkles}>
-        <Tabs items={advancedFeatures} defaultTab="dual-storage" />
+        <Tabs items={advancedTabs} defaultTab="dual-storage" />
       </DocSection>
 
-      <DocSection title="Recent Enhancements" icon={Zap}>
-        <p className="text-sm text-muted-foreground mb-4">
-          Continuous improvements based on user feedback and system performance analysis.
-        </p>
-
-        <CodeBlock title="Enhancement Timeline">
-          <StepList steps={enhancementTimeline} />
-        </CodeBlock>
-
-        <div className="grid md:grid-cols-3 gap-4 mt-4">
-          <HighlightBox type="success" title="UX Improvements">
-            <p className="text-xs">Copy functionality, feedback detection, persistent suggestions</p>
+      <DocSection title="Recent Enhancements">
+        <div className="grid md:grid-cols-3 gap-4">
+          <HighlightBox type="success" title="Smart Suggestions">
+            <p className="text-xs">Context-aware follow-up questions with localStorage persistence to prevent repetition</p>
           </HighlightBox>
-          <HighlightBox type="success" title="Performance Gains">
-            <p className="text-xs">25% token reduction, optimized context handling</p>
+          <HighlightBox type="success" title="Copy Functionality">
+            <p className="text-xs">Enhanced chat UX with message copying, feedback detection, and session persistence</p>
           </HighlightBox>
-          <HighlightBox type="success" title="Intelligence Boost">
-            <p className="text-xs">Semantic validation, adaptive learning, relevance checking</p>
+          <HighlightBox type="success" title="Token Optimization">
+            <p className="text-xs">25% token reduction through optimized prompts, dual storage, and context trimming</p>
           </HighlightBox>
         </div>
-      </DocSection>
-
-      <DocSection title="Technical Implementation">
-        <CodeBlock title="Feature Integration">
-{`// Advanced features working together in chat API
-export async function POST(req: Request) {
-  // 1. Dual storage retrieval
-  const sessionHistory = await loadConversationHistory(sessionId);
-  const feedbackPreferences = await loadFeedbackPreferences(sessionId);
-  
-  // 2. Semantic validation with error classification  
-  const validation = validateQuery(cleanQuery);
-  if (!validation.isValid) {
-    return getPersonaResponse(validation.errorType, mood);
-  }
-  
-  // 3. Context relevance checking
-  const ragContext = await searchVectorContext(vectorIndex, cleanQuery);
-  const contextRelevance = validateContextRelevance(cleanQuery, ragContext);
-  
-  // 4. Smart suggestion generation
-  const suggestions = generateContextualSuggestions(sessionHistory);
-  
-  // 5. Persona-aware response generation
-  const response = await streamText({
-    model: groq('llama-3.1-8b-instant'),
-    system: buildPersonaPrompt(mood, feedbackPreferences),
-    // ...
-  });
-}`}
-        </CodeBlock>
       </DocSection>
     </div>
   );
