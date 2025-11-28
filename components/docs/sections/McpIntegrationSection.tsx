@@ -49,25 +49,16 @@ export function McpIntegrationSection() {
       content: (
         <div className="space-y-4">
           <CodeBlock title="Claude Desktop Configuration">
-{`{
-  "mcpServers": {
-    "digital-twin-portfolio": {
-      "command": "node",
-      "args": ["-e", "
-        const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-        const { HTTPTransport } = require('@modelcontextprotocol/sdk/client/http.js');
-        
-        const transport = new HTTPTransport(new URL('https://m-njp.vercel.app/api/mcp'));
-        const client = new Client({
-          name: 'digital-twin-client',
-          version: '1.0.0'
-        }, { capabilities: {} });
-        
-        client.connect(transport);
-      "]
+{`"mcpServers": {
+    "digital-twin-production": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://m-njp.vercel.app/api/mcp"
+      ]
     }
-  }
-}`}
+  }`}
           </CodeBlock>
 
           <HighlightBox type="info" title="Quick Setup">

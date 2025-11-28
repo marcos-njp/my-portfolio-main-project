@@ -13,6 +13,7 @@ import {
   GithubSection,
   LibUtilitiesSection,
   PersonalitySystemSection,
+  AdvancedFeaturesSection,
 } from "@/components/docs/sections";
 
 const sections = [
@@ -89,7 +90,7 @@ export default function DocsContent() {
       case "personality-system":
         return <PersonalitySystemSection />;
       case "advanced-features":
-        return <PersonalitySystemSection />;
+        return <AdvancedFeaturesSection />;
       case "mcp-integration":
         return <McpIntegrationSection />;
       case "testing":
