@@ -149,37 +149,7 @@ export async function POST(req: Request) {
     const followUpPatterns = /^(yes|yeah|sure|ok|okay|tell me more|elaborate|continue|go on|please|why|how|what about)$/i;
     const isFollowUpResponse = followUpPatterns.test(cleanQuery.trim());
 
-    // ========== STEP 0.3: Enhanced Query Validation (Off-topic + Professional + Knowledge Gaps) ==========
-    const validation = validateQuery(cleanQuery);
-    
-    if (!validation.isValid && !isShortFollowUp && !isFollowUpResponse) {
-      console.log(`[Query Validation] Rejected: "${cleanQuery}" - Type: ${validation.errorType || 'unknown'}, Specific: ${validation.specificType || 'none'}`);
-      
-      // Use persona-aware error response based on error type
-      const errorMessage = validation.errorType 
-        ? getPersonaResponse(validation.errorType, mood)
-        : validation.reason; // Fallback to generic reason
-      
-      return new Response(
-        JSON.stringify({ 
-          error: 'invalid_query',
-          message: errorMessage
-        }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-    }
-    
-    // Enhance query with professional terms if detected
-    const enhancedQuery = enhanceQuery(cleanQuery);
-    console.log(`[Query Validation] Valid: ${validation.isValid}, Confidence: ${validation.confidence.toFixed(2)}, Category: ${validation.category || 'none'}`);
-    if (enhancedQuery !== cleanQuery) {
-      console.log(`[Query Enhancement] Enhanced: "${cleanQuery}" → "${enhancedQuery}"`);
-    }
-
-    // ========== STEP 0.5: Check for Unprofessional Requests ==========
+    // ========== STEP 0.5: Check for Unprofessional Requests FIRST ==========
     if (isUnprofessionalRequest(cleanQuery)) {
       console.log(`[Adaptive Feedback] Rejected unprofessional request: "${cleanQuery}"`);
       return new Response(
@@ -194,10 +164,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // ========== STEP 0.6: Detect User Feedback & Learn ==========
+    // ========== STEP 0.6: Detect User Feedback & Learn BEFORE Validation ==========
     const detectedFeedback = detectFeedback(cleanQuery);
+    let isFeedbackQuery = false;
+    
     if (detectedFeedback) {
       console.log(`[Adaptive Feedback] Detected ${detectedFeedback.type} feedback:`, detectedFeedback.instruction);
+      isFeedbackQuery = true; // Mark as feedback to bypass validation
       
       if (detectedFeedback.isProfessional) {
         // Apply and save feedback preferences
@@ -207,6 +180,44 @@ export async function POST(req: Request) {
         // Log unprofessional feedback but don't apply it
         console.log(`[Adaptive Feedback] Rejected unprofessional feedback:`, detectedFeedback.instruction);
       }
+    }
+
+    // ========== STEP 0.3: Enhanced Query Validation (Off-topic + Professional + Knowledge Gaps) ==========
+    // Skip validation for feedback queries, follow-ups, and short responses
+    const shouldSkipValidation = isFeedbackQuery || isShortFollowUp || isFollowUpResponse;
+    
+    if (!shouldSkipValidation) {
+      const validation = validateQuery(cleanQuery);
+      
+      if (!validation.isValid) {
+        console.log(`[Query Validation] Rejected: "${cleanQuery}" - Type: ${validation.errorType || 'unknown'}, Specific: ${validation.specificType || 'none'}`);
+        
+        // Use persona-aware error response based on error type
+        const errorMessage = validation.errorType 
+          ? getPersonaResponse(validation.errorType, mood)
+          : validation.reason; // Fallback to generic reason
+        
+        return new Response(
+          JSON.stringify({ 
+            error: 'invalid_query',
+            message: errorMessage
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }
+      
+      console.log(`[Query Validation] Valid: ${validation.isValid}, Confidence: ${validation.confidence.toFixed(2)}, Category: ${validation.category || 'none'}`);
+    } else {
+      console.log(`[Query Validation] Skipped validation for: ${isFeedbackQuery ? 'feedback' : 'follow-up'} query`);
+    }
+    
+    // Enhance query with professional terms if detected
+    const enhancedQuery = enhanceQuery(cleanQuery);
+    if (enhancedQuery !== cleanQuery) {
+      console.log(`[Query Enhancement] Enhanced: "${cleanQuery}" → "${enhancedQuery}"`);
     }
 
     // ========== STEP 1.5: FAQ Pattern Matching (Boost Interview Questions) ==========
