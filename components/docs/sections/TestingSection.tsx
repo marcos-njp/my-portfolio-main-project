@@ -108,6 +108,49 @@ System: ✓ Checks history for "it" → References AI Portfolio`}
       )
     },
     {
+      id: "integration",
+      label: "System Integration",
+      icon: Zap,
+      content: (
+        <div className="space-y-4">
+          <HighlightBox type="success" title="Major Consolidation (Latest)">
+            <p className="text-xs">Unified validation pipeline combining query preprocessing, typo correction, semantic validation, and adaptive feedback detection into a maintainable architecture</p>
+          </HighlightBox>
+
+          <ComparisonGrid
+            before={{
+              title: "Before Integration", 
+              items: [
+                "Scattered validation logic across files",
+                "Hardcoded typo correction dictionary",
+                "Redundant knowledge gap detectors", 
+                "Feedback detection issues after validation"
+              ]
+            }}
+            after={{
+              title: "After Integration",
+              items: [
+                "Consolidated lib/query-validator.ts",
+                "Pattern-based typo correction system",
+                "Unified semantic validation with confidence scoring",
+                "Properly ordered feedback detection pipeline"
+              ]
+            }}
+          />
+
+          <CodeBlock title="New Architecture">
+{`// Consolidated validation pipeline in chat API:
+1. Preprocess query (typo fixes)
+2. Detect feedback BEFORE validation 
+3. Validate query (off-topic, professional, knowledge gaps)
+4. Enhanced query for better results
+5. RAG search with context relevance checking
+6. Generate persona-aware response`}
+          </CodeBlock>
+        </div>
+      )
+    },
+    {
       id: "optimization",
       label: "Performance Tuning",
       icon: TrendingUp,
@@ -134,24 +177,28 @@ System: ✓ Checks history for "it" → References AI Portfolio`}
 
   const feedbackImplementations = [
     {
-      title: "Smart Suggestions",
-      description: "localStorage-persisted suggestions with conversation awareness"
+      title: "Adaptive Feedback Detection",
+      description: "Learns user preferences (\"be more detailed\", \"shorter responses\") and applies them persistently"
     },
     {
-      title: "Development Transparency", 
-      description: "Clear disclaimer about AI limitations for user expectations"
+      title: "Pattern-Based Typo Correction",
+      description: "Intelligent typo fixing using regex patterns instead of hardcoded dictionaries"
     },
     {
-      title: "Always-Visible Prompts",
-      description: "Persistent question suggestions for better discoverability"
+      title: "Consolidated Validation Pipeline", 
+      description: "Single source of truth for query validation with semantic confidence scoring"
     },
     {
-      title: "Graceful Error Handling",
-      description: "Persona-aware error responses with 6 distinct error types"
+      title: "Context Relevance Checking",
+      description: "Validates that RAG results actually answer the user's question before responding"
     },
     {
-      title: "Progressive UX",
-      description: "Multi-stage loading with timeout protection and abort controller"
+      title: "Proper Pipeline Ordering",
+      description: "Feedback detection now runs before validation to prevent interference"
+    },
+    {
+      title: "Knowledge Gap Detection",
+      description: "Smart fallback messages when AI doesn't have sufficient context to answer"
     }
   ];
 
@@ -160,7 +207,7 @@ System: ✓ Checks history for "it" → References AI Portfolio`}
       <div>
         <h1 className="text-4xl font-bold tracking-tight mb-3">Testing & Evolution</h1>
         <p className="text-xl text-muted-foreground">
-          Continuous improvements to AI response quality, user experience, and system performance through iterative testing.
+          Recent major system integration consolidating validation pipelines, adaptive feedback detection, and performance optimization through iterative testing and refactoring.
         </p>
       </div>
 
@@ -212,12 +259,14 @@ System: ✓ Checks history for "it" → References AI Portfolio`}
         </div>
 
         <CodeBlock title="Key Metrics" className="mt-4">
-{`📊 System Performance:
-• Response Time: 1-4s (most queries)
-• Memory Usage: 25% token reduction
+{`📊 System Performance (Updated):
+• Response Time: 1-4s (most queries) 
+• Memory Usage: ~25% token reduction via optimization
 • Follow-up Accuracy: 95% pronoun resolution
-• Error Handling: 6 persona-aware error types
-• Timeout Protection: 12s with AbortController`}
+• Validation Pipeline: Consolidated from 5+ files to 3 core modules
+• Feedback Learning: Persistent user preferences with session memory
+• Context Relevance: Smart checking prevents hallucinated responses
+• Error Types: 6 persona-aware error categories (off-topic, rate-limit, etc.)`}
         </CodeBlock>
       </DocSection>
     </div>

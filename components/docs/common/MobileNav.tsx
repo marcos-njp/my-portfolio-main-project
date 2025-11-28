@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Menu, X, FileText, Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database } from "lucide-react";
+import { Menu, X, FileText, Cpu, Zap, Plug, TestTube, AlertCircle, Github, Database, FileCode } from "lucide-react";
 
 const navigation = [
   { name: "Overview", href: "/docs", icon: FileText },
   { name: "RAG Architecture", href: "/docs?section=rag-architecture", icon: Cpu },
+  { name: "Lib Utilities", href: "/docs?section=lib-utilities", icon: FileCode },
   { name: "Advanced Features", href: "/docs?section=advanced-features", icon: Zap },
   { name: "MCP Integration", href: "/docs?section=mcp-integration", icon: Plug },
   { name: "Testing & Evolution", href: "/docs?section=testing", icon: TestTube },

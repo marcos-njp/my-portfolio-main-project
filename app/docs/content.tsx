@@ -36,7 +36,7 @@ const sections = [
   },
   {
     title: "Advanced Features",
-    href: "/docs?section=personality-system",
+    href: "/docs?section=advanced-features",
     icon: Zap,
     description: "Dual storage system, persona-aware errors, smart suggestions, semantic validation, and enhanced chat experience."
   },
@@ -89,7 +89,7 @@ export default function DocsContent() {
       case "personality-system":
         return <PersonalitySystemSection />;
       case "advanced-features":
-        return <LibUtilitiesSection />;
+        return <PersonalitySystemSection />;
       case "mcp-integration":
         return <McpIntegrationSection />;
       case "testing":

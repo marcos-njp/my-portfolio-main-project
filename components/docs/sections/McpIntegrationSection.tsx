@@ -22,7 +22,7 @@ export function McpIntegrationSection() {
     },
     {
       title: "Chat Processing",
-      description: "Standard chat pipeline: validation, RAG search, AI generation, persona awareness"
+      description: "Consolidated pipeline: typo correction → feedback detection → validation → RAG search → persona-aware AI generation"
     },
     {
       title: "Response Formatting",
@@ -85,12 +85,12 @@ export function McpIntegrationSection() {
       content: (
         <div className="space-y-4">
           <HighlightBox type="success" title="chat_with_digital_twin">
-            <p className="text-xs mb-2">Primary tool for conversing with the AI digital twin</p>
+            <p className="text-xs mb-2">Primary tool for conversing with the AI digital twin. Features adaptive feedback learning, consolidated validation, and persona-aware responses.</p>
             <div className="space-y-1 text-xs">
               <p><strong>Parameters:</strong></p>
               <p>• message (required): Your question or conversation</p>
               <p>• mood (optional): "professional" or "genz"</p> 
-              <p>• sessionId (optional): Conversation continuity</p>
+              <p>• sessionId (optional): Conversation continuity & feedback preferences</p>
             </div>
           </HighlightBox>
 
