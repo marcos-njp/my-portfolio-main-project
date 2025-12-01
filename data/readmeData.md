@@ -6,9 +6,8 @@ The digital twin operates in two distinct modes:
 - **Gen-Z Mode**: Casual conversation, modern expressions, relatable and approachable tone
 
 ### personality.json
-This file defines the dual personality system with mood-specific response templates:
+This file defines the personality of the AI with mood-specific response templates:
 - Response patterns for professional and Gen-Z modes
-- Error handling templates with personality consistency
 - Conversation tone guidelines and switching logic
 - Fallback responses for various scenarios
 
@@ -29,8 +28,6 @@ Both JSON files serve as source material for the vector database:
 4. **Update Frequency**: Re-import after significant profile or personality changes
 
 ## Usage Instructions
-- Update personality.json when modifying response styles or adding new mood patterns
-- Modify digitaltwin.json when professional information or background changes
 - Re-run vector import script after any content updates to maintain search accuracy
 - Test both personality modes after updates to ensure consistency
 
